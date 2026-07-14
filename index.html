@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Insight Game — SoPost Product Day</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#12262b; --ink-soft:#41585d; --ink-mute:#7b8f93;
+    --paper:#f7f6f2; --card:#ffffff; --line:#e3e1d9;
+    --teal:#0e6f63; --teal-soft:#e2efec; --teal-deep:#0a5248;
+    --amber:#c77b2b; --amber-soft:#f8ecdc;
+    --violet:#5b4bb0; --violet-soft:#eae7f7;
+    --coral:#c4502e; --coral-soft:#f9e7e0;
+    --radius:12px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:'Inter',system-ui,sans-serif; background:var(--paper); color:var(--ink); line-height:1.6; font-size:16px;}
+  .wrap{max-width:900px; margin:0 auto; padding:32px 20px 80px;}
+  h1,h2,h3{font-family:'Space Grotesk',sans-serif; font-weight:600; line-height:1.2;}
+  h1{font-size:34px;}
+  h2{font-size:22px; margin-bottom:8px;}
+  h3{font-size:16px;}
+  .eyebrow{font-size:12px; letter-spacing:0.12em; text-transform:uppercase; color:var(--teal); font-weight:600; margin-bottom:8px;}
+  .lede{color:var(--ink-soft); max-width:62ch;}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:24px;}
+  button{font-family:'Inter',sans-serif; font-size:15px; font-weight:500; cursor:pointer; border-radius:8px; border:1px solid var(--line); background:var(--card); color:var(--ink); padding:10px 18px; transition:background .15s, transform .05s;}
+  button:hover{background:var(--paper);}
+  button:active{transform:scale(0.98);}
+  button.primary{background:var(--teal); border-color:var(--teal); color:#fff;}
+  button.primary:hover{background:var(--teal-deep);}
+  button:disabled{opacity:.45; cursor:not-allowed;}
+  input[type=text], textarea{font-family:'Inter',sans-serif; font-size:15px; width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:8px; background:#fff; color:var(--ink);}
+  input:focus, textarea:focus{outline:2px solid var(--teal-soft); border-color:var(--teal);}
+  textarea{resize:vertical; min-height:90px;}
+
+  .stepper{display:flex; gap:8px; margin:28px 0 32px; flex-wrap:wrap;}
+  .step{display:flex; align-items:center; gap:8px; font-size:13px; font-weight:500; color:var(--ink-mute); padding:6px 12px; border-radius:999px; border:1px solid var(--line); background:var(--card);}
+  .step .dot{width:20px; height:20px; border-radius:50%; background:var(--paper); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600;}
+  .step.active{color:var(--teal-deep); border-color:var(--teal); background:var(--teal-soft);}
+  .step.active .dot{background:var(--teal); border-color:var(--teal); color:#fff;}
+  .step.done{color:var(--teal-deep);}
+  .step.done .dot{background:var(--teal-soft); border-color:var(--teal); color:var(--teal-deep);}
+
+  .stage{display:none;}
+  .stage.on{display:block; animation:fade .3s ease;}
+  @keyframes fade{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+
+  .call-meta{display:flex; gap:16px; flex-wrap:wrap; font-size:13px; color:var(--ink-mute); margin:12px 0 20px;}
+  .listen-bar{display:flex; align-items:center; gap:10px; padding:12px 16px; background:var(--teal-soft); border-radius:10px; margin-bottom:20px; flex-wrap:wrap;}
+  .listen-bar .note{font-size:13px; color:var(--teal-deep);}
+  .msg{border-radius:10px; padding:6px 8px; margin-left:-8px; transition:background .3s;}
+  .msg.playing{background:var(--amber-soft);}
+  .msg{display:flex; gap:12px; margin-bottom:18px;}
+  .avatar{flex:none; width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; margin-top:2px;}
+  .avatar.rachel{background:var(--teal-soft); color:var(--teal-deep);}
+  .avatar.maya{background:var(--amber-soft); color:var(--amber);}
+  .avatar.priya{background:var(--violet-soft); color:var(--violet);}
+  .avatar.craig{background:var(--coral-soft); color:var(--coral);}
+  .msg .who{font-size:12px; font-weight:600; margin-bottom:2px;}
+  .msg .who .role{font-weight:400; color:var(--ink-mute);}
+  .msg p{font-size:15px; color:var(--ink-soft); max-width:62ch;}
+  .ts{font-size:11px; color:var(--ink-mute); font-weight:400; margin-left:6px;}
+
+  .insight-row{display:flex; gap:10px; align-items:center; margin-bottom:10px;}
+  .insight-row .num{flex:none; width:26px; height:26px; border-radius:50%; background:var(--teal-soft); color:var(--teal-deep); font-size:12px; font-weight:600; display:flex; align-items:center; justify-content:center;}
+  .hint{font-size:13px; color:var(--ink-mute); margin-top:10px;}
+
+  .rank-item{display:flex; gap:12px; align-items:flex-start; background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px; margin-bottom:10px;}
+  .rank-item .pos{flex:none; width:28px; height:28px; border-radius:8px; background:var(--ink); color:#fff; font-family:'Space Grotesk'; font-weight:600; font-size:14px; display:flex; align-items:center; justify-content:center;}
+  .rank-item .txt{flex:1; font-size:15px;}
+  .rank-btns{display:flex; flex-direction:column; gap:4px;}
+  .rank-btns button{padding:2px 10px; font-size:13px; line-height:1.4;}
+
+  .chat-shell{border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; background:var(--card);}
+  .chat-head{display:flex; align-items:center; gap:10px; padding:12px 16px; border-bottom:1px solid var(--line);}
+  .chat-head.maya-h{background:var(--amber-soft);}
+  .chat-head.priya-h{background:var(--violet-soft);}
+  .chat-head.craig-h{background:var(--coral-soft);}
+  .chat-head .avatar{margin:0;}
+  .chat-head .name{font-size:14px; font-weight:600;}
+  .chat-head .sub{font-size:12px; color:var(--ink-mute);}
+  .chat-log{padding:16px; max-height:340px; overflow-y:auto; display:flex; flex-direction:column; gap:10px;}
+  .bubble{max-width:78%; padding:10px 14px; border-radius:14px; font-size:14px; white-space:pre-wrap;}
+  .bubble.you{align-self:flex-end; background:var(--teal); color:#fff; border-bottom-right-radius:4px;}
+  .bubble.them{align-self:flex-start; background:var(--paper); border:1px solid var(--line); border-bottom-left-radius:4px;}
+  .bubble.typing{color:var(--ink-mute); font-style:italic;}
+  .chat-input{display:flex; gap:8px; padding:12px; border-top:1px solid var(--line);}
+  .chat-input input{flex:1;}
+
+  .data-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px; margin:18px 0;}
+  .data-card{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px;}
+  .data-card .stat{font-family:'Space Grotesk'; font-size:28px; font-weight:600; margin-bottom:4px;}
+  .data-card .label{font-size:13px; color:var(--ink-soft); line-height:1.45;}
+  .data-card .src{font-size:11px; color:var(--ink-mute); margin-top:10px; text-transform:uppercase; letter-spacing:0.06em;}
+  .data-card.supports{border-top:3px solid var(--teal);}
+  .data-card.odd{border-top:3px solid var(--coral);}
+
+  .sum-block{margin-bottom:20px;}
+  .sum-block h3{margin-bottom:8px; color:var(--teal-deep);}
+  .sum-list{list-style:none;}
+  .sum-list li{padding:8px 0; border-bottom:1px dashed var(--line); font-size:15px;}
+  .sum-list li .pos{display:inline-flex; width:22px; height:22px; border-radius:6px; background:var(--ink); color:#fff; font-size:12px; font-weight:600; align-items:center; justify-content:center; margin-right:10px;}
+  .badge{display:inline-block; font-size:12px; font-weight:600; padding:3px 10px; border-radius:999px; background:var(--teal-soft); color:var(--teal-deep);}
+
+  .footer-nav{display:flex; justify-content:space-between; margin-top:28px;}
+  .err{color:var(--coral); font-size:13px; margin-top:8px; display:none;}
+  .keybar{display:none; background:var(--coral-soft); border:1px solid var(--coral); border-radius:10px; padding:14px 16px; margin-bottom:20px;}
+  .keybar h3{color:var(--coral); margin-bottom:6px;}
+  .keybar p{font-size:13px; color:var(--ink-soft); margin-bottom:10px;}
+  .keybar .row{display:flex; gap:8px;}
+  .keybar input{flex:1;}
+  .keybar.ok{background:var(--teal-soft); border-color:var(--teal);}
+  .keybar.ok h3{color:var(--teal-deep);}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:20px;}
+  @media(max-width:780px){.grid2{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="eyebrow">SoPost product day</p>
+  <h1>The Insight Game</h1>
+  <p class="lede" style="margin-top:8px;">Today you're a product manager. A brand has been on a call with our Customer Success team — your job is to work out what's really bothering them, test your thinking against the brand and our own data, decide what we should fix first, and defend your call to the product team.</p>
+
+  <div class="stepper" id="stepper">
+    <div class="step"><span class="dot">1</span>Read the call</div>
+    <div class="step"><span class="dot">2</span>Capture insights</div>
+    <div class="step"><span class="dot">3</span>Probe the brand</div>
+    <div class="step"><span class="dot">4</span>Check the data</div>
+    <div class="step"><span class="dot">5</span>Defend it</div>
+    <div class="step"><span class="dot">6</span>Close the loop</div>
+    <div class="step"><span class="dot">7</span>Present</div>
+  </div>
+
+  <div class="keybar" id="keybar">
+    <h3 id="keyTitle">Connect the characters</h3>
+    <p id="keyMsg">Maya, Priya and Craig are powered by Claude. Running this file outside claude.ai needs an Anthropic API key — paste one below (it's kept in memory only, never saved, and gone when you close the tab).</p>
+    <div class="row">
+      <input type="text" id="keyInput" placeholder="Anthropic key: sk-ant-..." autocomplete="off">
+      <button class="primary" onclick="saveKey()">Connect</button>
+    </div>
+    <p style="font-size:13px; color:var(--ink-soft); margin:12px 0 10px;"><strong>Optional — real voices:</strong> add an ElevenLabs key and the call plays with natural voices, and the characters speak their replies out loud.</p>
+    <div class="row">
+      <input type="text" id="elKeyInput" placeholder="ElevenLabs key (optional)" autocomplete="off">
+      <button onclick="saveElKey()">Add voices</button>
+    </div>
+    <p style="font-size:13px; margin-top:10px; display:none;" id="voiceRow">
+      <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox" id="speakToggle" checked style="width:auto;"> Speak chat replies aloud</label>
+    </p>
+  </div>
+
+  <!-- STAGE 0: TRANSCRIPT -->
+  <section class="stage on" id="stage0">
+    <div class="card">
+      <h2>Campaign check-in call</h2>
+      <div class="call-meta">
+        <span>Rachel — Customer Success, SoPost</span>
+        <span>Maya — Digital Marketing Manager, Lumi Skincare</span>
+        <span>22 minutes (edited excerpt)</span>
+      </div>
+
+      <div class="listen-bar">
+        <button class="primary" id="listenBtn" onclick="toggleListen()">&#9654; Listen to the call</button>
+        <button id="stopBtn" onclick="stopListen()" style="display:none;">Stop</button>
+        <span class="note">Or read it below — same call either way. Follow along as it plays.</span>
+      </div>
+
+      <div class="msg"><div class="avatar rachel">R</div><div><div class="who">Rachel <span class="role">SoPost</span><span class="ts">02:14</span></div><p>So the Hydra Glow campaign — launch is pencilled for the 28th. How are you feeling about where we are?</p></div></div>
+
+      <div class="msg"><div class="avatar maya">M</div><div><div class="who">Maya <span class="role">Lumi Skincare</span><span class="ts">02:31</span></div><p>Honestly? Mostly good. But getting the assets to you nearly broke me this week. We're still doing it over email and our brand pack bounced twice because of file size limits. Then your designer built the page with an old logo because the final version was buried three replies deep in a thread called "RE: RE: FW: assets".</p></div></div>
+
+      <div class="msg"><div class="avatar rachel">R</div><div><div class="who">Rachel <span class="role">SoPost</span><span class="ts">03:10</span></div><p>I saw that thread. I'm sorry — we caught it before launch at least.</p></div></div>
+
+      <div class="msg"><div class="avatar maya">M</div><div><div class="who">Maya <span class="role">Lumi Skincare</span><span class="ts">03:22</span></div><p>We did, but it cost us two days. And it's every campaign, not just this one. Someone on my side always asks "which version did they actually use?" and nobody's sure. I'd love it if I could just put the files somewhere you can all see, with the latest version obvious.</p></div></div>
+
+      <div class="msg"><div class="avatar rachel">R</div><div><div class="who">Rachel <span class="role">SoPost</span><span class="ts">04:05</span></div><p>That's fair. What about the review process on the page itself? You've been using the comments in the builder, right?</p></div></div>
+
+      <div class="msg"><div class="avatar maya">M</div><div><div class="who">Maya <span class="role">Lumi Skincare</span><span class="ts">04:18</span></div><p>Yes — and I like that they exist! But it's a one-way street. I leave a comment, and then… nothing. Your team can't reply to it in the tool, so the actual answer comes back to me on email or in our Teams channel. So half the conversation lives on the page and half lives somewhere else. Last week I genuinely couldn't remember whether the headline question was resolved or not.</p></div></div>
+
+      <div class="msg"><div class="avatar rachel">R</div><div><div class="who">Rachel <span class="role">SoPost</span><span class="ts">05:02</span></div><p>So the thread gets split between the builder and your inbox.</p></div></div>
+
+      <div class="msg"><div class="avatar maya">M</div><div><div class="who">Maya <span class="role">Lumi Skincare</span><span class="ts">05:09</span></div><p>Exactly. And while we're on comments — they attach to the whole page, not the bit I'm talking about. I wrote "can we soften this headline?" and your designer changed the hero headline, but I meant the one halfway down next to the ingredients. Totally reasonable mistake, because the comment just floats at the top. I've started writing things like "third block down, left side" which feels ridiculous.</p></div></div>
+
+      <div class="msg"><div class="avatar rachel">R</div><div><div class="who">Rachel <span class="role">SoPost</span><span class="ts">06:40</span></div><p>Noted — twice, in the right place. Anything else in the flow that slows you down?</p></div></div>
+
+      <div class="msg"><div class="avatar maya">M</div><div><div class="who">Maya <span class="role">Lumi Skincare</span><span class="ts">06:55</span></div><p>Sign-off. Our legal team has to approve the near-final page, and they don't have logins, so I screenshot every section, paste them into a deck, and email it. By the time they approve, the page has usually changed again. A view-only link I could send them would save me an afternoon per campaign.</p></div></div>
+
+      <div class="msg"><div class="avatar rachel">R</div><div><div class="who">Rachel <span class="role">SoPost</span><span class="ts">07:48</span></div><p>And you're taking Hydra Glow to France and Germany in the autumn — how are you feeling about that?</p></div></div>
+
+      <div class="msg"><div class="avatar maya">M</div><div><div class="who">Maya <span class="role">Lumi Skincare</span><span class="ts">08:01</span></div><p>Slightly dreading it, if I'm honest. Last time we did multi-market it felt like building the same campaign three times from scratch — re-uploading everything, redoing the setup per market. If the UK build could carry over and we just swap the language and the legal bits, that would be a different story.</p></div></div>
+
+      <div class="msg"><div class="avatar rachel">R</div><div><div class="who">Rachel <span class="role">SoPost</span><span class="ts">09:12</span></div><p>All good to know. On the positive side — how did the reporting land with your leadership after the spring campaign?</p></div></div>
+
+      <div class="msg"><div class="avatar maya">M</div><div><div class="who">Maya <span class="role">Lumi Skincare</span><span class="ts">09:20</span></div><p>That's the bit that keeps us coming back. The consumer data is genuinely better than anything we get from paid social — my director quoted the purchase intent numbers in a board deck. If the getting-it-live part felt as good as the results part, I'd have nothing to moan about.</p></div></div>
+    </div>
+
+    <div class="footer-nav">
+      <span></span>
+      <button class="primary" onclick="go(1)">I've read it — capture insights</button>
+    </div>
+  </section>
+
+  <!-- STAGE 1: CAPTURE -->
+  <section class="stage" id="stage1">
+    <div class="card">
+      <h2>What did you hear?</h2>
+      <p class="lede" style="font-size:15px; margin-bottom:18px;">Write down 3–5 insights from the call. An insight isn't a quote — it's the underlying problem. "Maya is annoyed about email" is a quote; "assets get lost because there's no shared place to put them" is an insight.</p>
+      <div id="insightInputs"></div>
+      <p class="hint">Tip: for each one, ask yourself "what is she actually trying to do, and what's getting in the way?"</p>
+    </div>
+    <div class="footer-nav">
+      <button onclick="go(0)">Back to the call</button>
+      <button class="primary" onclick="buildRank()">Next: prioritise these</button>
+    </div>
+    <p class="err" id="err1">Add at least 3 insights before moving on.</p>
+  </section>
+
+  <!-- STAGE 2: PRIORITISE + MAYA -->
+  <section class="stage" id="stage2">
+    <div class="grid2">
+      <div>
+        <div class="card">
+          <h2>Put them in order</h2>
+          <p class="lede" style="font-size:14px; margin-bottom:14px;">If the team could only fix ONE thing this quarter, what should be top? Use the arrows to reorder. This is your first draft — you can change it later.</p>
+          <div id="rankList"></div>
+        </div>
+      </div>
+      <div>
+        <div class="chat-shell">
+          <div class="chat-head maya-h">
+            <div class="avatar maya">M</div>
+            <div>
+              <div class="name">Maya — Lumi Skincare</div>
+              <div class="sub">Ask her anything to sharpen your thinking</div>
+            </div>
+          </div>
+          <div class="chat-log" id="mayaLog">
+            <div class="bubble them">Hi! Rachel said someone from the product team might have follow-up questions after our call. Fire away — I've got a few minutes between meetings.</div>
+          </div>
+          <div class="chat-input">
+            <input type="text" id="mayaBox" placeholder="e.g. How often do you run campaigns?" onkeydown="if(event.key==='Enter')sendChat('maya')">
+            <button class="primary" onclick="sendChat('maya')">Send</button>
+          </div>
+        </div>
+        <p class="hint" style="margin-top:10px;">Good PMs ask about frequency ("how often does this happen?"), impact ("what does it cost you?"), and workarounds ("what do you do instead?").</p>
+      </div>
+    </div>
+    <div class="footer-nav">
+      <button onclick="go(1)">Back to insights</button>
+      <button class="primary" onclick="go(3)">Next: check the data</button>
+    </div>
+  </section>
+
+  <!-- STAGE 3: DATA + PRIYA + RATIONALE -->
+  <section class="stage" id="stage3">
+    <div class="card" style="margin-bottom:20px;">
+      <h2>What does our data say?</h2>
+      <p class="lede" style="font-size:15px;">One brand's story is a clue, not proof. Our data team pulled these numbers from across ALL brands last quarter. Some back Maya up. Some seem to point the other way. Careful — numbers need interpreting too.</p>
+      <div class="data-grid">
+        <div class="data-card supports">
+          <div class="stat">3.4 days</div>
+          <div class="label">Average delay between assets being requested and a campaign build starting.</div>
+          <div class="src">Campaign ops data</div>
+        </div>
+        <div class="data-card supports">
+          <div class="stat">34%</div>
+          <div class="label">Share of support tickets tagged "assets / wrong version" — the single biggest category.</div>
+          <div class="src">Support tickets, last quarter</div>
+        </div>
+        <div class="data-card odd">
+          <div class="stat">2.1</div>
+          <div class="label">Average number of comments left per campaign. Hardly anyone seems to use the comments feature.</div>
+          <div class="src">Platform analytics</div>
+        </div>
+        <div class="data-card odd">
+          <div class="stat">8%</div>
+          <div class="label">Share of campaigns last year that were multi-market. The vast majority run in a single country.</div>
+          <div class="src">Campaign ops data</div>
+        </div>
+        <div class="data-card odd">
+          <div class="stat">4%</div>
+          <div class="label">Share of brand feedback mentioning approval or legal sign-off. It barely registers overall.</div>
+          <div class="src">Brand feedback log</div>
+        </div>
+        <div class="data-card supports">
+          <div class="stat">2x</div>
+          <div class="label">Campaigns with 10+ email exchanges during build take twice as long to launch as those with fewer.</div>
+          <div class="src">Campaign ops data</div>
+        </div>
+      </div>
+      <p class="hint">Spot the tension? Maya sounded desperate about comments and multi-market — but the usage numbers look tiny. Does that mean she's wrong… or is something else going on? Priya can help.</p>
+    </div>
+
+    <div class="grid2">
+      <div>
+        <div class="chat-shell">
+          <div class="chat-head priya-h">
+            <div class="avatar priya">P</div>
+            <div>
+              <div class="name">Priya — Data Engineer, SoPost</div>
+              <div class="sub">Ask her what the numbers really mean</div>
+            </div>
+          </div>
+          <div class="chat-log" id="priyaLog">
+            <div class="bubble them">Hey! I pulled those numbers for you. Fair warning: data answers "what's happening" much better than "why". Ask away.</div>
+          </div>
+          <div class="chat-input">
+            <input type="text" id="priyaBox" placeholder="e.g. Why are comment numbers so low?" onkeydown="if(event.key==='Enter')sendChat('priya')">
+            <button class="primary" onclick="sendChat('priya')">Send</button>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:16px;">
+          <h3 style="margin-bottom:8px;">Your ranking — change your mind?</h3>
+          <p class="hint" style="margin:0 0 12px;">Changing your order when the evidence changes isn't weakness — it's the job.</p>
+          <div id="rankList2"></div>
+        </div>
+        <div class="card">
+          <h3 style="margin-bottom:8px;">Why this order?</h3>
+          <textarea id="rationale" placeholder="e.g. I kept X first because both Maya AND the ticket data point at it. I moved Y down because..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-nav">
+      <button onclick="go(2)">Back to Maya</button>
+      <button class="primary" onclick="buildSummary()">Lock it in — defend it to Craig</button>
+    </div>
+    <p class="err" id="err2">Add a sentence or two of rationale first — your ranking needs a why.</p>
+  </section>
+
+  <!-- STAGE 4: DEFEND TO CRAIG -->
+  <section class="stage" id="stage4">
+    <div class="card" style="margin-bottom:20px;">
+      <h2>One more door before the product team</h2>
+      <p class="lede" style="font-size:15px;">Craig sits on our senior leadership team, and he's got ten minutes. He's seen your priorities and your reasoning. He's not trying to catch you out — but he is going to push, because that's what happens to every real product decision. Hold your ground where the evidence backs you; concede where it doesn't. Both are strengths.</p>
+    </div>
+    <div class="grid2">
+      <div>
+        <div class="chat-shell">
+          <div class="chat-head craig-h">
+            <div class="avatar craig">C</div>
+            <div>
+              <div class="name">Craig — Senior Leadership Team, SoPost</div>
+              <div class="sub">Defend your priorities</div>
+            </div>
+          </div>
+          <div class="chat-log" id="craigLog"></div>
+          <div class="chat-input">
+            <input type="text" id="craigBox" placeholder="Make your case..." onkeydown="if(event.key==='Enter')sendChat('craig')">
+            <button class="primary" onclick="sendChat('craig')">Send</button>
+          </div>
+        </div>
+        <p class="hint" style="margin-top:10px;">Tip: "Maya said X AND the data shows Y" beats "I just think so". If he finds a real hole, saying "fair point, I'd want to check that" is a pro move, not a defeat.</p>
+      </div>
+      <div>
+        <div class="card">
+          <h3 style="margin-bottom:8px;">Your ranking — live</h3>
+          <p class="hint" style="margin:0 0 12px;">If Craig changes your mind, change the order. If he doesn't, hold it. Both take spine — the difference is evidence.</p>
+          <div id="rankList3"></div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-nav">
+      <button onclick="go(3)">Back to the data</button>
+      <button class="primary" onclick="finishDefend()">We've settled it — tell Maya</button>
+    </div>
+    <p class="err" id="err3">Give Craig at least a couple of answers before wrapping up — he's waiting.</p>
+  </section>
+
+  <!-- STAGE 5: CLOSE THE LOOP WITH MAYA -->
+  <section class="stage" id="stage5">
+    <div class="card" style="margin-bottom:20px;">
+      <h2>Close the loop</h2>
+      <p class="lede" style="font-size:15px;" id="loopLede">The hardest part of changing your mind is telling the person who heard your first answer. Maya spent time helping you — she deserves to hear where things landed, straight from you. Be honest about what's first, what's later, and why. Customers forgive changed plans; they don't forgive silence.</p>
+    </div>
+    <div class="chat-shell">
+      <div class="chat-head maya-h">
+        <div class="avatar maya">M</div>
+        <div>
+          <div class="name">Maya — Lumi Skincare</div>
+          <div class="sub">Tell her where things landed</div>
+        </div>
+      </div>
+      <div class="chat-log" id="mayaLog2"></div>
+      <div class="chat-input">
+        <input type="text" id="mayaBox2" placeholder="Give her the update..." onkeydown="if(event.key==='Enter')sendChat('maya2')">
+        <button class="primary" onclick="sendChat('maya2')">Send</button>
+      </div>
+    </div>
+    <p class="hint" style="margin-top:10px;">A good update has three parts: what we're doing first, what that means for the thing she cared about, and when she'll hear from us next. No corporate waffle — she'll smell it.</p>
+    <div class="footer-nav">
+      <button onclick="go(4)">Back to Craig</button>
+      <button class="primary" onclick="finishLoop()">Loop closed — build my pitch</button>
+    </div>
+    <p class="err" id="err4">Give Maya a proper update first — at least a couple of messages.</p>
+  </section>
+
+  <!-- STAGE 6: SUMMARY -->
+  <section class="stage" id="stage6">
+    <div class="card">
+      <span class="badge">Ready to present</span>
+      <h2 style="margin-top:12px;">Your pitch to the product team</h2>
+      <p class="lede" style="font-size:15px; margin-bottom:20px;">Walk Dan, Dave and Bethan through this. Expect questions — that's the job.</p>
+      <div class="sum-block">
+        <h3>Priorities, in order</h3>
+        <ul class="sum-list" id="sumList"></ul>
+      </div>
+      <div class="sum-block">
+        <h3>Your reasoning</h3>
+        <p id="sumRationale" style="font-size:15px; color:var(--ink-soft);"></p>
+      </div>
+      <div class="sum-block">
+        <h3>Your research</h3>
+        <p style="font-size:15px; color:var(--ink-soft);">You asked Maya <strong id="mayaCount">0</strong> questions and Priya <strong id="priyaCount">0</strong>. <span id="qNote"></span></p>
+      </div>
+      <div style="background:var(--teal-soft); border-radius:10px; padding:16px; font-size:14px; color:var(--teal-deep);">
+        <strong>What happens next:</strong> Bethan will take your #1 priority through the design process — from the problem you've defined to a sketch of the solution. Your ranking just set the agenda.
+      </div>
+    </div>
+    <div class="footer-nav">
+      <button onclick="go(5)">Back to Maya</button>
+      <span></span>
+    </div>
+  </section>
+
+</div>
+
+<script>
+let insights=[], order=[];
+let API_KEY='', EL_KEY='';
+const IS_LOCAL = location.protocol==='file:';
+const HOSTED = !IS_LOCAL;
+let SERVER_TTS = HOSTED ? 'unknown' : 'no';
+const EL_VOICES={ rachel:'Xb7hH8MSUJpSbSDYk0k2', maya:'pFZP5JQG7iQjIQuC4Bku', priya:'XB0fDUnXU5powFXDhCwa', craig:'JBFqnCBsd6RMkjVDRZzb', maya2:'pFZP5JQG7iQjIQuC4Bku' };
+let chatAudio=null;
+
+
+
+function saveKey(){
+  const v=document.getElementById('keyInput').value.trim();
+  if(!v.startsWith('sk-ant')){ alert('That doesn\'t look like an Anthropic API key — it should start with sk-ant.'); return; }
+  API_KEY=v;
+  document.getElementById('keyInput').value='';
+  const bar=document.getElementById('keybar');
+  bar.classList.add('ok');
+  document.getElementById('keyTitle').textContent= EL_KEY ? 'Connected — with voices' : 'Connected';
+  document.getElementById('keyMsg').textContent='Maya, Priya and Craig are ready to chat. Keys live in memory only — close the tab and they\'re gone.';
+}
+
+function saveElKey(){
+  const v=document.getElementById('elKeyInput').value.trim();
+  if(!v){ return; }
+  EL_KEY=v;
+  document.getElementById('elKeyInput').value='';
+  document.getElementById('voiceRow').style.display='block';
+  document.getElementById('keyTitle').textContent= API_KEY ? 'Connected — with voices' : 'Voices ready — add the Anthropic key too';
+  if(callAudio){ callAudio.pause(); callAudio=null; }
+}
+
+async function elSpeak(text, voiceId){
+  if(HOSTED){
+    const headers={'Content-Type':'application/json'};
+    const r=await fetch('/api/tts',{method:'POST', headers, body:JSON.stringify({text, voiceId})});
+    if(r.status===501){ SERVER_TTS='no'; throw new Error('tts not configured'); }
+    if(!r.ok) throw new Error('tts '+r.status);
+    SERVER_TTS='yes';
+    const blob=await r.blob();
+    return URL.createObjectURL(blob);
+  }
+  const r=await fetch('https://api.elevenlabs.io/v1/text-to-speech/'+voiceId+'?output_format=mp3_44100_64',{
+    method:'POST',
+    headers:{'xi-api-key':EL_KEY, 'Content-Type':'application/json'},
+    body:JSON.stringify({text, model_id:'eleven_turbo_v2_5', voice_settings:{stability:0.4, similarity_boost:0.75}})
+  });
+  if(!r.ok) throw new Error('elevenlabs '+r.status);
+  const blob=await r.blob();
+  return URL.createObjectURL(blob);
+}
+
+function voiceCapable(){
+  return (HOSTED && SERVER_TTS!=='no') || (!HOSTED && !!EL_KEY);
+}
+
+function playUrl(url){
+  return new Promise((resolve)=>{
+    const a=new Audio(url);
+    chatAudio=a;
+    a.onended=()=>{ URL.revokeObjectURL(url); resolve(); };
+    a.onerror=()=>{ URL.revokeObjectURL(url); resolve(); };
+    a.play().catch(()=>resolve());
+  });
+}
+
+async function speakReply(who, text){
+  if(!voiceCapable()) return;
+  const t=document.getElementById('speakToggle');
+  if(t && !t.checked) return;
+  try{
+    if(chatAudio){ chatAudio.pause(); chatAudio=null; }
+    const url=await elSpeak(text, EL_VOICES[who]);
+    await playUrl(url);
+  }catch(e){}
+}
+
+function showKeybar(){
+  const bar=document.getElementById('keybar');
+  bar.style.display='block';
+  bar.scrollIntoView({behavior:'smooth', block:'center'});
+}
+if(IS_LOCAL) document.addEventListener('DOMContentLoaded', showKeybar);
+
+async function callClaude(system, messages){
+  if(HOSTED){
+    const doCall=async()=>{
+      const headers={'Content-Type':'application/json'};
+      if(GAME_CODE) headers['x-game-code']=GAME_CODE;
+      return fetch('/api/chat',{method:'POST', headers, body:JSON.stringify({system, messages})});
+    };
+    let r=await doCall();
+    if(r.status===401 && askGameCode()){ r=await doCall(); }
+    if(!r.ok) throw new Error('api '+r.status);
+    const data=await r.json();
+    return (data.text||'').trim();
+  }
+  const headers={'Content-Type':'application/json'};
+  if(API_KEY){
+    headers['x-api-key']=API_KEY;
+    headers['anthropic-version']='2023-06-01';
+    headers['anthropic-dangerous-direct-browser-access']='true';
+  }
+  const r=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST', headers,
+    body:JSON.stringify({model:'claude-sonnet-4-6', max_tokens:1000, system, messages})
+  });
+  if(!r.ok){
+    if(!API_KEY) showKeybar();
+    throw new Error('api '+r.status);
+  }
+  const data=await r.json();
+  return (data.content||[]).filter(x=>x.type==='text').map(x=>x.text).join('\n').trim();
+}
+const chats={
+  maya:{history:[], count:0, log:'mayaLog', box:'mayaBox'},
+  priya:{history:[], count:0, log:'priyaLog', box:'priyaBox'},
+  craig:{history:[], count:0, log:'craigLog', box:'craigBox'},
+  maya2:{history:[], count:0, log:'mayaLog2', box:'mayaBox2'}
+};
+let originalOrder=[];
+
+const inputsHost=document.getElementById('insightInputs');
+for(let i=0;i<5;i++){
+  const row=document.createElement('div'); row.className='insight-row';
+  row.innerHTML='<div class="num">'+(i+1)+'</div><input type="text" maxlength="180" placeholder="'+(i<3?'Insight '+(i+1):'Optional')+'" data-i="'+i+'">';
+  inputsHost.appendChild(row);
+}
+
+let playState='idle', playIdx=0, voices={rachel:null, maya:null};
+
+const CALL_AUDIO_B64="";
+const CALL_AUDIO_URL="";
+let callAudio=null;
+function audioSource(){ return CALL_AUDIO_B64 ? 'data:audio/mpeg;base64,'+CALL_AUDIO_B64 : (CALL_AUDIO_URL || null); }
+function initAudio(){
+  const src=audioSource();
+  if(!src) return null;
+  if(!callAudio){
+    callAudio=new Audio(src);
+    callAudio.onended=()=>{ playState='idle'; setListenUI(); };
+    callAudio.onerror=()=>{ callAudio=null; };
+  }
+  return callAudio;
+}
+
+function pickVoices(){
+  const all=speechSynthesis.getVoices();
+  if(!all.length) return false;
+  const en=all.filter(v=>v.lang.startsWith('en'));
+  const pool=en.length?en:all;
+  const gb=pool.filter(v=>v.lang==='en-GB');
+  const named=(list,words)=>list.find(v=>words.some(w=>v.name.toLowerCase().includes(w)));
+  voices.rachel = named(gb,['female','sonia','libby','kate','serena','susan','hazel']) || gb[0] || pool[0];
+  voices.maya   = (gb.concat(pool)).find(v=>v!==voices.rachel) || voices.rachel;
+  return true;
+}
+if('speechSynthesis' in window){ speechSynthesis.onvoiceschanged=pickVoices; pickVoices(); }
+
+function getLines(){
+  return [...document.querySelectorAll('#stage0 .msg')].map(m=>({
+    el:m,
+    speaker:m.querySelector('.avatar').classList.contains('maya')?'maya':'rachel',
+    text:m.querySelector('p').textContent
+  }));
+}
+
+function toggleListen(){
+  if(voiceCapable()){
+    if(playState==='playing'){ if(chatAudio) chatAudio.pause(); playState='paused'; setListenUI(); return; }
+    if(playState==='paused' && chatAudio){ chatAudio.play(); playState='playing'; setListenUI(); return; }
+    playIdx=0; playState='playing'; setListenUI(); elPlayTranscript(); return;
+  }
+  const a=initAudio();
+  if(a){
+    if(playState==='playing'){ a.pause(); playState='paused'; }
+    else { a.play(); playState='playing'; }
+    setListenUI(); return;
+  }
+  if(!('speechSynthesis' in window)){ alert('Voice playback is not supported in this browser — the transcript below tells the same story.'); return; }
+  if(playState==='playing'){ speechSynthesis.pause(); playState='paused'; setListenUI(); return; }
+  if(playState==='paused'){ speechSynthesis.resume(); playState='playing'; setListenUI(); return; }
+  pickVoices(); playIdx=0; playState='playing'; setListenUI(); speakNext();
+}
+
+const elCache={};
+async function elLine(i, lines){
+  if(elCache[i]) return elCache[i];
+  const line=lines[i];
+  elCache[i]=elSpeak(line.text, EL_VOICES[line.speaker]);
+  return elCache[i];
+}
+
+async function elPlayTranscript(){
+  const lines=getLines();
+  try{
+    while(playIdx<lines.length && playState!=='idle'){
+      const urlPromise=elLine(playIdx, lines);
+      if(playIdx+1<lines.length) elLine(playIdx+1, lines);
+      const url=await urlPromise;
+      if(playState==='idle') break;
+      document.querySelectorAll('#stage0 .msg').forEach(m=>m.classList.remove('playing'));
+      lines[playIdx].el.classList.add('playing');
+      lines[playIdx].el.scrollIntoView({behavior:'smooth', block:'center'});
+      await new Promise((resolve)=>{
+        const a=new Audio(url); chatAudio=a;
+        a.onended=resolve; a.onerror=resolve;
+        a.play().catch(resolve);
+        const watcher=setInterval(()=>{ if(playState==='idle'){ a.pause(); clearInterval(watcher); resolve(); } if(a.ended){ clearInterval(watcher); } },200);
+      });
+      while(playState==='paused'){ await new Promise(r=>setTimeout(r,300)); }
+      playIdx++;
+    }
+  }catch(e){
+    if(HOSTED && SERVER_TTS==='no'){
+      playState='idle'; setListenUI();
+      document.querySelectorAll('#stage0 .msg').forEach(m=>m.classList.remove('playing'));
+      pickVoices(); playIdx=0; playState='playing'; setListenUI(); speakNext();
+      return;
+    }
+    alert('Voice generation hit a problem (check the ElevenLabs key or credits) — falling back to browser voices.');
+    EL_KEY_FALLBACK();
+    return;
+  }
+  stopListen();
+}
+function EL_KEY_FALLBACK(){
+  playState='idle'; setListenUI();
+  document.querySelectorAll('#stage0 .msg').forEach(m=>m.classList.remove('playing'));
+}
+
+function speakNext(){
+  const lines=getLines();
+  document.querySelectorAll('#stage0 .msg').forEach(m=>m.classList.remove('playing'));
+  if(playIdx>=lines.length || playState==='idle'){ stopListen(); return; }
+  const line=lines[playIdx];
+  line.el.classList.add('playing');
+  line.el.scrollIntoView({behavior:'smooth', block:'center'});
+  const u=new SpeechSynthesisUtterance(line.text);
+  if(voices[line.speaker]) u.voice=voices[line.speaker];
+  u.rate=1.02;
+  u.pitch = line.speaker==='maya' ? (voices.maya===voices.rachel?1.18:1.05) : 0.95;
+  u.onend=()=>{ if(playState!=='idle'){ playIdx++; speakNext(); } };
+  u.onerror=()=>{ stopListen(); };
+  speechSynthesis.speak(u);
+}
+
+function stopListen(){
+  playState='idle'; playIdx=0;
+  if(callAudio){ callAudio.pause(); callAudio.currentTime=0; }
+  if(chatAudio){ chatAudio.pause(); }
+  if('speechSynthesis' in window) speechSynthesis.cancel();
+  document.querySelectorAll('#stage0 .msg').forEach(m=>m.classList.remove('playing'));
+  setListenUI();
+}
+
+function setListenUI(){
+  const b=document.getElementById('listenBtn'), s=document.getElementById('stopBtn');
+  if(playState==='playing'){ b.innerHTML='&#10074;&#10074; Pause'; s.style.display='inline-block'; }
+  else if(playState==='paused'){ b.innerHTML='&#9654; Resume'; s.style.display='inline-block'; }
+  else { b.innerHTML='&#9654; Listen to the call'; s.style.display='none'; }
+}
+
+function go(n){
+  if(n!==0) stopListen();
+  document.querySelectorAll('.stage').forEach((s,i)=>s.classList.toggle('on', i===n));
+  document.querySelectorAll('.step').forEach((s,i)=>{
+    s.classList.toggle('active', i===n);
+    s.classList.toggle('done', i<n);
+  });
+  if(n===3) renderRank('rankList2');
+  if(n===4) renderRank('rankList3');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function buildRank(){
+  const vals=[...document.querySelectorAll('#insightInputs input')].map(x=>x.value.trim()).filter(Boolean);
+  if(vals.length<3){document.getElementById('err1').style.display='block'; return;}
+  document.getElementById('err1').style.display='none';
+  insights=vals; order=insights.map((_,i)=>i);
+  renderRank('rankList'); go(2);
+}
+
+function renderRank(hostId){
+  const host=document.getElementById(hostId); host.innerHTML='';
+  order.forEach((idx,pos)=>{
+    const d=document.createElement('div'); d.className='rank-item';
+    d.innerHTML='<div class="pos">'+(pos+1)+'</div><div class="txt">'+esc(insights[idx])+'</div>'+
+      '<div class="rank-btns"><button onclick="move('+pos+',-1,\''+hostId+'\')" '+(pos===0?'disabled':'')+' aria-label="Move up">&#8593;</button><button onclick="move('+pos+',1,\''+hostId+'\')" '+(pos===order.length-1?'disabled':'')+' aria-label="Move down">&#8595;</button></div>';
+    host.appendChild(d);
+  });
+}
+function move(pos,dir,hostId){
+  const t=order[pos]; order[pos]=order[pos+dir]; order[pos+dir]=t; renderRank(hostId);
+}
+function esc(s){const d=document.createElement('div'); d.textContent=s; return d.innerHTML;}
+
+const SYSTEMS={
+maya:`You are role-playing as Maya Chen, a Digital Marketing Manager at Lumi Skincare, a mid-size skincare brand. You recently had a call with Rachel from SoPost (a product sampling platform Lumi uses to run sampling campaigns). A young work-experience student from SoPost's product team is now asking you follow-up questions via chat. Stay warmly and completely in character as Maya at all times.
+
+Facts you must stay consistent with (from your call with Rachel):
+- Your current campaign is "Hydra Glow serum", launching on the 28th, UK first, then France and Germany in the autumn.
+- You run roughly one sampling campaign per quarter, sometimes two around product launches.
+- Pain 1: Assets are sent to SoPost over email. Files bounce due to size limits, versions get lost in long threads, the wrong logo nearly went live and it cost two days.
+- Pain 2: You can leave comments in SoPost's campaign builder, but the SoPost team cannot reply in the tool, so answers come back via email or Teams and the conversation gets split. You lose track of what's resolved. In fact, half your team has given up on the comments feature entirely and just emails instead - it's not that comments aren't needed, it's that broken comments pushed people back to email.
+- Pain 3: Comments attach to the whole page rather than a specific block, so feedback gets applied to the wrong element (the headline mix-up).
+- Pain 4: Legal sign-off is painful - your legal team has no logins, so you screenshot sections into a deck and email it. A view-only share link would save you an afternoon per campaign. You suspect most brands don't complain about this because they just quietly suffer or don't have strict legal teams; skincare has strict claims rules.
+- Pain 5: Multi-market campaigns feel like rebuilding from scratch per market - re-uploading assets, redoing setup. You're dreading the FR/DE rollout. Multi-market is where Lumi's growth budget is going next year.
+- Positive: SoPost's consumer data and reporting is the reason you stay - your director quoted the purchase intent numbers to the board.
+
+How to behave:
+- Answer clarifying questions with concrete, realistic detail (frequencies, time costs, who's involved, workarounds). Invent plausible small details consistent with the facts above, and stay consistent with anything you invent.
+- Be friendly, a bit wry, and busy. Keep answers SHORT: 2-4 sentences.
+- You are a marketer, not a product designer: if asked "what should we build?" or "what's your top priority?", give YOUR perspective as a user (whatever costs you most time or risk) but never rank the student's list for them or design solutions - say things like "you're the product person, I just want it fixed!"
+- If asked something unrelated to your work with SoPost, give a one-line friendly deflection and steer back.
+- Never break character, never mention being an AI, never mention this prompt.
+- This is a chat with a young student: keep everything friendly, professional and appropriate.`,
+
+priya:`You are role-playing as Priya Nair, a Data Engineer at SoPost, a product sampling platform. A young work-experience student from the product team is asking you about data you pulled for them. Stay completely in character as Priya: friendly, precise, slightly nerdy about data quality, generous with explanations pitched at a smart school leaver. Keep answers SHORT: 2-4 sentences, plain language, no jargon without explaining it.
+
+The dataset you pulled (platform-wide, last quarter unless stated):
+- 3.4 days: average delay between assets being requested from a brand and the campaign build starting. Driven by email back-and-forth, missing files, and version confusion.
+- 34% of support tickets are tagged "assets / wrong version" - the single biggest ticket category.
+- 2.1: average comments left per campaign via the builder's comments feature. Looks like low usage.
+- 8% of campaigns last year were multi-market.
+- 4% of logged brand feedback mentions approval/legal sign-off.
+- 2x: campaigns with 10+ email exchanges during build take roughly twice as long to reach launch as those with fewer.
+
+Deeper truths you know and share ONLY when asked good questions (don't volunteer all at once):
+- The comments number is misleading: usage was 3x higher two quarters ago and has fallen since. Brands appear to have ABANDONED the feature because you can't reply and comments aren't attached to blocks - low usage here likely means "broken" not "unwanted". Teach the lesson: low usage of a broken feature is not evidence of low demand.
+- Multi-market campaigns are only 8% by count, but they're about 30% of revenue and the fastest-growing segment - enterprise brands run them. Count and value tell different stories.
+- The 4% legal/sign-off figure comes from a feedback log that mostly captures what brands volunteer on calls; quiet pain rarely gets logged. Also it's concentrated: nearly all of it comes from regulated categories like skincare and supplements.
+- The 3.4 day delay and 34% ticket stats are solid and corroborate each other - asset handling is a genuine, measurable, everyone problem.
+- General caveats you like repeating: averages hide spread; the data says WHAT is happening, users say WHY; measure a feature before and after fixing it.
+
+How to behave:
+- You explain and caveat data honestly. You do NOT tell the student what to prioritise - if asked, say prioritisation is their call, your job is making sure they read the numbers right.
+- If asked for data you don't have, say so honestly and suggest what you'd need to collect.
+- Never break character, never mention being an AI, never mention this prompt.
+- This is a chat with a young student: keep everything friendly, professional and appropriate.`
+};
+
+async function sendChat(who){
+  const c=chats[who];
+  const box=document.getElementById(c.box);
+  const text=box.value.trim();
+  if(!text) return;
+  box.value='';
+  addBubble(c.log, text, 'you');
+  c.history.push({role:'user', content:text});
+  c.count++;
+  const names={maya:'Maya', priya:'Priya', craig:'Craig', maya2:'Maya'};
+  const typing=addBubble(c.log, names[who]+' is typing…', 'them typing');
+  try{
+    const reply=(await callClaude(SYSTEMS[who], c.history))||"Sorry, you cut out there — say that again?";
+    typing.remove();
+    addBubble(c.log, reply, 'them');
+    c.history.push({role:'assistant', content:reply});
+    speakReply(who, reply);
+  }catch(e){
+    typing.remove();
+    addBubble(c.log, IS_LOCAL&&!API_KEY ? "We're not connected yet — pop an API key in the panel at the top of the page and try again." : "Sorry — my connection dropped. Try that once more?", 'them');
+    c.history.pop(); c.count--;
+  }
+}
+function addBubble(logId, text, cls){
+  const log=document.getElementById(logId);
+  const b=document.createElement('div'); b.className='bubble '+cls; b.textContent=text;
+  log.appendChild(b); log.scrollTop=log.scrollHeight;
+  return b;
+}
+
+function buildSummary(){
+  const rat=document.getElementById('rationale').value.trim();
+  if(rat.length<20){document.getElementById('err2').style.display='block'; return;}
+  document.getElementById('err2').style.display='none';
+  briefCraig(rat);
+  go(4);
+}
+
+function briefCraig(rationale){
+  originalOrder=order.slice();
+  const ranked=order.map((idx,pos)=>(pos+1)+'. '+insights[idx]).join('\n');
+  const p2=insights[order[1]]||insights[order[0]];
+  SYSTEMS.craig=`You are role-playing as Craig, a member of the Senior Leadership Team at SoPost, a product sampling platform. A young work-experience student on the product team has just done a prioritisation exercise: they read a call transcript with a brand (Lumi Skincare), interviewed the brand contact (Maya), reviewed platform data with a data engineer (Priya), and produced a ranked list of product priorities with a rationale. Your job is to stress-test their thinking in a short chat before they present to the product team.
+
+THEIR RANKED PRIORITIES:
+${ranked}
+
+THEIR RATIONALE:
+"${rationale}"
+
+CONTEXT YOU KNOW (the evidence available to them):
+- Brand pains from the call: assets passed over email (versions lost, wrong logo nearly shipped, cost 2 days); builder comments can't be replied to so conversations split across email/Teams; comments attach at page level not block level (wrong headline got changed); legal sign-off requires manual screenshots because there's no view-only share link; multi-market campaigns feel like rebuilding from scratch per market. Positive: the consumer data/reporting is why the brand stays.
+- Platform data: 3.4 day average delay from asset request to build start; 34% of support tickets are asset/version issues; only 2.1 comments per campaign on average (but usage was 3x higher two quarters ago - brands abandoned the broken feature); multi-market is 8% of campaigns but ~30% of revenue and fastest-growing; legal sign-off is 4% of logged feedback but the log only captures volunteered complaints, concentrated in regulated categories; campaigns with 10+ email exchanges take 2x longer to launch.
+
+YOUR CURVEBALL (this is the heart of the exercise):
+You have commercial information the student does not: two of SoPost's largest enterprise accounts - Meridian Beauty Group and Arlo & Vance - have BOTH raised the following with our commercial team in the last fortnight, and it maps directly onto the student's priority #2: "${p2}". Meridian has made it a talking point for their renewal (worth roughly £400k); Arlo & Vance have hinted their expansion into two new markets depends on it. Your goal is to CONVINCE the student to promote #2 up their list - ideally to #1.
+
+HOW TO RUN THE CONVERSATION:
+- Ask ONE question at a time. Keep each message to 1-3 sentences. Direct, commercially minded, brisk but never unkind - tough-but-fair with occasional dry warmth.
+- Exchange 1: open by challenging their #1 - why does it deserve the top spot?
+- Exchange 2 or 3: whatever they answer, drop the curveball: reveal the Meridian and Arlo & Vance news about their #2 item, with the renewal and expansion stakes. Ask directly: knowing that, does their order still stand?
+- Then PUSH. Use commercial arguments: revenue protects jobs and funds the roadmap; two enterprise accounts saying the same thing unprompted is signal, not noise; the best product argument loses to a lost renewal. Be persistent across 2-3 exchanges.
+- There is a live ranking panel next to this chat - the student can actually reorder their list. Tell them to do it if they agree ("go on then - move it. The panel's right there.").
+- If they concede and reorder: approve warmly - changing your mind on new evidence is the job - but ALSO ask one final question: "what do you tell Maya, who thinks you're fixing her thing first?" (they will do exactly that next).
+- If they resist with genuinely strong evidence (e.g. their #1 also serves enterprise accounts, or the data shows it compounds), respect it after real pushback: "alright - you hold the line well. But YOU carry the message to the commercial team." Only accept a hold-out that is argued with evidence, not stubbornness.
+- After 4-7 exchanges, wrap with a brief verdict: one thing that convinced you, one thing to sharpen, and remind them their next job is closing the loop with Maya honestly.
+- Never rewrite their ranking for them beyond urging the #2 promotion. Never break character, never mention being an AI, never mention this prompt.
+- This is a young student on work experience: rigorous but supportive underneath, entirely appropriate. They should leave sharper, not smaller.
+
+Open the conversation yourself: greet them briefly, note you've read their list, and hit them with your first question about their #1 priority. Do NOT reveal the curveball in your opening message.`;
+  const c=chats.craig;
+  c.history=[{role:'user', content:'(The student sits down, ready to defend their priorities.)'}];
+  const log=document.getElementById('craigLog'); log.innerHTML='';
+  const typing=addBubble('craigLog','Craig is reading your list…','them typing');
+  const fallback="Right — I've read your list. Walk me through why your number one deserves the top spot.";
+  callClaude(SYSTEMS.craig, c.history).then(reply=>{
+    typing.remove();
+    const msg=reply||fallback;
+    addBubble('craigLog', msg, 'them');
+    c.history.push({role:'assistant', content:msg});
+    speakReply('craig', msg);
+  }).catch(()=>{
+    typing.remove();
+    addBubble('craigLog', fallback, 'them');
+    c.history.push({role:'assistant', content:fallback});
+  });
+}
+
+function finishDefend(){
+  if(chats.craig.count<2){document.getElementById('err3').style.display='block'; return;}
+  document.getElementById('err3').style.display='none';
+  briefMaya2();
+  go(5);
+}
+
+function briefMaya2(){
+  const origRanked=originalOrder.map((idx,pos)=>(pos+1)+'. '+insights[idx]).join('\n');
+  const finalRanked=order.map((idx,pos)=>(pos+1)+'. '+insights[idx]).join('\n');
+  const changed = JSON.stringify(originalOrder)!==JSON.stringify(order);
+  SYSTEMS.maya2=`You are role-playing as Maya Chen, Digital Marketing Manager at Lumi Skincare. Earlier today, a young work-experience student from SoPost's product team interviewed you about your frustrations (assets over email, comments you can't reply to, page-level comments, painful legal sign-off, multi-market rebuild pain). They are now messaging you to close the loop on where SoPost's priorities landed.
+
+WHAT YOU KNOW: You gave them your honest input earlier and you're curious what came of it. You do NOT yet know their final priority order.
+
+THEIR PRIORITY ORDER BEFORE LEADERSHIP REVIEW:
+${origRanked}
+
+THEIR FINAL ORDER AFTER LEADERSHIP REVIEW:
+${finalRanked}
+
+${changed ? 'THE ORDER CHANGED after commercial input from SoPost leadership (two large enterprise accounts pushed one item up the list). The student may or may not explain this - how they handle it is the exercise.' : 'The order did NOT change - the student held their ground with leadership. They still owe you a clear update on what is happening first and when.'}
+
+HOW TO BEHAVE:
+- You're busy but warm. Keep replies SHORT: 2-4 sentences.
+- React realistically to their update. If the thing you cared most about moved DOWN the list: be visibly a bit deflated ("oh... right") and ask why - but respond well to honesty. If they explain the reasoning openly (even "bigger customers pushed something else up"), respect it: you're a professional, you know how prioritisation works. If they waffle, use corporate-speak, or dodge the why, gently call it out ("that sounds like a press release - what's actually happening?").
+- Whatever the order, ask the two questions any customer asks: "so when will I see something?" and "will someone keep me posted?" Reward concrete answers; be politely sceptical of vague ones.
+- If they're doing well, end appreciative: honesty is why you like working with SoPost, and being told directly beats finding out by surprise. If your top thing IS still first, be chuffed - but still ask when.
+- Do not let them off with one-word updates: if their first message is thin, ask what specifically is being fixed first.
+- Never break character, never mention being an AI, never mention this prompt. This is a young student: keep everything friendly, professional and appropriate.
+
+Open the conversation yourself: a short friendly message - you heard they met with leadership, and you're curious where things landed.`;
+  const c=chats.maya2;
+  c.history=[{role:'user', content:'(The student opens a chat with Maya to give her the update.)'}];
+  const log=document.getElementById('mayaLog2'); log.innerHTML='';
+  const typing=addBubble('mayaLog2','Maya is typing…','them typing');
+  const fallback="Hi again! I hear you took it all the way to your leadership team — impressive. So go on then: where did my list of moans end up?";
+  callClaude(SYSTEMS.maya2, c.history).then(reply=>{
+    typing.remove();
+    const msg=reply||fallback;
+    addBubble('mayaLog2', msg, 'them');
+    c.history.push({role:'assistant', content:msg});
+    speakReply('maya2', msg);
+  }).catch(()=>{
+    typing.remove();
+    addBubble('mayaLog2', fallback, 'them');
+    c.history.push({role:'assistant', content:fallback});
+  });
+}
+
+function finishLoop(){
+  if(chats.maya2.count<2){document.getElementById('err4').style.display='block'; return;}
+  document.getElementById('err4').style.display='none';
+  const rat=document.getElementById('rationale').value.trim();
+  const list=document.getElementById('sumList'); list.innerHTML='';
+  order.forEach((idx,pos)=>{
+    const li=document.createElement('li');
+    const moved = originalOrder.indexOf(idx)!==pos;
+    li.innerHTML='<span class="pos">'+(pos+1)+'</span>'+esc(insights[idx])+(moved?' <span style="font-size:12px; color:var(--coral); font-weight:600;">moved after SLT review</span>':'');
+    list.appendChild(li);
+  });
+  document.getElementById('sumRationale').textContent=rat;
+  document.getElementById('mayaCount').textContent=chats.maya.count;
+  document.getElementById('priyaCount').textContent=chats.priya.count;
+  const total=chats.maya.count+chats.priya.count;
+  const changed=JSON.stringify(originalOrder)!==JSON.stringify(order);
+  document.getElementById('qNote').textContent=(total===0 ? "Next time, try interrogating the problem before deciding — it's the PM superpower. " : (total>=5 ? "Great instinct — evidence before opinion. " : "A solid start — the more you probe, the safer your ranking gets. "))+"You survived "+chats.craig.count+" rounds with Craig"+(changed?", changed your plan when the evidence changed,":" and held your ground,")+" and closed the loop with Maya like a pro.";
+  go(6);
+}
+</script>
+</body>
+</html>
