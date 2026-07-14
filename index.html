@@ -136,12 +136,8 @@
   </div>
 
   <div class="keybar" id="keybar">
-    <h3 id="keyTitle">Connect the characters</h3>
-    <p id="keyMsg">Maya, Priya and Craig are powered by Claude. Running this file outside claude.ai needs an Anthropic API key — paste one below (it's kept in memory only, never saved, and gone when you close the tab).</p>
-    <div class="row">
-      <input type="text" id="keyInput" placeholder="Anthropic key: sk-ant-..." autocomplete="off">
-      <button class="primary" onclick="saveKey()">Connect</button>
-    </div>
+    <h3 id="keyTitle">Secure chat connection</h3>
+    <p id="keyMsg">Maya, Priya and Craig are powered by Anthropic through the secure server-side key configured for this deployment. No API key is sent from the browser.</p>
     <p style="font-size:13px; color:var(--ink-soft); margin:12px 0 10px;"><strong>Optional — real voices:</strong> add an ElevenLabs key and the call plays with natural voices, and the characters speak their replies out loud.</p>
     <div class="row">
       <input type="text" id="elKeyInput" placeholder="ElevenLabs key (optional)" autocomplete="off">
@@ -432,7 +428,7 @@
 
 <script>
 let insights=[], order=[];
-let API_KEY='', EL_KEY='';
+let EL_KEY='';
 const IS_LOCAL = location.protocol==='file:';
 const HOSTED = !IS_LOCAL;
 let SERVER_TTS = HOSTED ? 'unknown' : 'no';
@@ -441,24 +437,14 @@ let chatAudio=null;
 
 
 
-function saveKey(){
-  const v=document.getElementById('keyInput').value.trim();
-  if(!v.startsWith('sk-ant')){ alert('That doesn\'t look like an Anthropic API key — it should start with sk-ant.'); return; }
-  API_KEY=v;
-  document.getElementById('keyInput').value='';
-  const bar=document.getElementById('keybar');
-  bar.classList.add('ok');
-  document.getElementById('keyTitle').textContent= EL_KEY ? 'Connected — with voices' : 'Connected';
-  document.getElementById('keyMsg').textContent='Maya, Priya and Craig are ready to chat. Keys live in memory only — close the tab and they\'re gone.';
-}
-
 function saveElKey(){
   const v=document.getElementById('elKeyInput').value.trim();
   if(!v){ return; }
   EL_KEY=v;
   document.getElementById('elKeyInput').value='';
   document.getElementById('voiceRow').style.display='block';
-  document.getElementById('keyTitle').textContent= API_KEY ? 'Connected — with voices' : 'Voices ready — add the Anthropic key too';
+  document.getElementById('keyTitle').textContent='Voices ready';
+  document.getElementById('keyMsg').textContent='Maya, Priya and Craig are powered by Anthropic through the secure server-side key configured for this deployment. No API key is sent from the browser.';
   if(callAudio){ callAudio.pause(); callAudio=null; }
 }
 
@@ -515,17 +501,6 @@ function showKeybar(){
 document.addEventListener('DOMContentLoaded', showKeybar);
 
 async function callClaude(system, messages){
-  if(API_KEY){
-    const headers={'Content-Type':'application/json'};
-    headers['x-api-key']=API_KEY;
-    headers['anthropic-version']='2023-06-01';
-    headers['anthropic-dangerous-direct-browser-access']='true';
-    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST', headers, body:JSON.stringify({model:'claude-sonnet-4-6', max_tokens:1000, system, messages})});
-    if(!r.ok){ throw new Error('api '+r.status); }
-    const data=await r.json();
-    return (data.content||[]).filter(x=>x.type==='text').map(x=>x.text).join('\n').trim();
-  }
-
   const r=await fetch('/api/chat',{method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({system, messages})});
   if(!r.ok){
     const body=await r.json().catch(()=>({}));
@@ -784,8 +759,8 @@ async function sendChat(who){
   }catch(e){
     typing.remove();
     const msg = e && e.message==='anthropic not configured'
-      ? "Anthropic isn't configured yet. Paste an API key in the panel above and try again."
-      : (IS_LOCAL&&!API_KEY ? "We're not connected yet — pop an API key in the panel at the top of the page and try again." : "Sorry — my connection dropped. Try that once more?");
+      ? "Anthropic isn't configured on the server yet. Please try again later."
+      : "Sorry — my connection dropped. Try that once more?";
     addBubble(c.log, msg, 'them');
     c.history.pop(); c.count--;
   }
