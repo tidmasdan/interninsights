@@ -19,7 +19,7 @@ export default async function handler(req, res) {
   // Only allow the four voices the game actually uses
   const ALLOWED = new Set([
     'Xb7hH8MSUJpSbSDYk0k2', // Rachel (Alice)
-    'pFZP5JQG7iQjIQuC4Bku', // Maya (Lily)
+    'PoHUWWWMHFrA8z7Q88pu', // Maya (Miranda)
     'XB0fDUnXU5powFXDhCwa', // Priya (Charlotte)
     'JBFqnCBsd6RMkjVDRZzb'  // Craig (George)
   ]);
