@@ -147,56 +147,85 @@
 
   <!-- STAGE 0: TRANSCRIPT -->
   <section class="stage on" id="stage0">
-    <div class="card">
-      <h2>Campaign check-in call</h2>
-      <div class="call-meta">
-        <span>Rachel — Customer Success, SoPost</span>
-        <span>Maya — Digital Marketing Manager, Lumi Skincare (US)</span>
-        <span>22 minutes (edited excerpt)</span>
+    <div class="grid2">
+      <div>
+        <div class="card">
+          <h2>Campaign check-in call</h2>
+          <div class="call-meta">
+            <span>Rachel — Customer Success, SoPost</span>
+            <span>Maya — Digital Marketing Manager, Lumi Skincare (US)</span>
+            <span>22 minutes (edited excerpt)</span>
+          </div>
+
+          <div class="listen-bar">
+            <button class="primary" id="listenBtn" onclick="toggleListen()">&#9654; Listen to the call</button>
+            <button id="stopBtn" onclick="stopListen()" style="display:none;">Stop</button>
+            <span class="note">Or read it below — same call either way. Follow along as it plays.</span>
+          </div>
+
+          <div>
+            <div class="msg"><div class="avatar rachel">R</div><div><div class="who">Rachel <span class="role">SoPost</span><span class="ts">02:14</span></div><p>So the Hydra Glow campaign — launch is pencilled for the 28th. How are you feeling about where we are?</p></div></div>
+
+            <div class="msg"><div class="avatar maya">M</div><div><div class="who">Maya <span class="role">Lumi Skincare</span><span class="ts">02:31</span></div><p>Honestly? Mostly good. But getting the assets to you nearly broke me this week. We're still doing it over email and our brand pack bounced twice because of file size limits. Then your designer built the page with an old logo because the final version was buried three replies deep in a thread called "RE: RE: FW: assets".</p></div></div>
+
+            <div class="msg"><div class="avatar rachel">R</div><div><div class="who">Rachel <span class="role">SoPost</span><span class="ts">03:10</span></div><p>I saw that thread. I'm sorry — we caught it before launch at least.</p></div></div>
+
+            <div class="msg"><div class="avatar maya">M</div><div><div class="who">Maya <span class="role">Lumi Skincare</span><span class="ts">03:22</span></div><p>We did, but it cost us two days. And it's every campaign, not just this one. Someone on my side always asks "which version did they actually use?" and nobody's sure. I'd love it if I could just put the files somewhere you can all see, with the latest version obvious.</p></div></div>
+
+            <div class="msg"><div class="avatar rachel">R</div><div><div class="who">Rachel <span class="role">SoPost</span><span class="ts">04:05</span></div><p>That's fair. What about the review process on the page itself? You've been using the comments in the builder, right?</p></div></div>
+
+            <div class="msg"><div class="avatar maya">M</div><div><div class="who">Maya <span class="role">Lumi Skincare</span><span class="ts">04:18</span></div><p>Yes — and I like that they exist! But it's a one-way street. I leave a comment, and then… nothing. Your team can't reply to it in the tool, so the actual answer comes back to me on email or in our Teams channel. So half the conversation lives on the page and half lives somewhere else. Last week I genuinely couldn't remember whether the headline question was resolved or not.</p></div></div>
+
+            <div class="msg"><div class="avatar rachel">R</div><div><div class="who">Rachel <span class="role">SoPost</span><span class="ts">05:02</span></div><p>So the thread gets split between the builder and your inbox.</p></div></div>
+
+            <div class="msg"><div class="avatar maya">M</div><div><div class="who">Maya <span class="role">Lumi Skincare</span><span class="ts">05:09</span></div><p>Exactly. And while we're on comments — they attach to the whole page, not the bit I'm talking about. I wrote "can we soften this headline?" and your designer changed the hero headline, but I meant the one halfway down next to the ingredients. Totally reasonable mistake, because the comment just floats at the top. I've started writing things like "third block down, left side" which feels ridiculous.</p></div></div>
+
+            <div class="msg"><div class="avatar rachel">R</div><div><div class="who">Rachel <span class="role">SoPost</span><span class="ts">06:40</span></div><p>Noted — twice, in the right place. Anything else in the flow that slows you down?</p></div></div>
+
+            <div class="msg"><div class="avatar maya">M</div><div><div class="who">Maya <span class="role">Lumi Skincare</span><span class="ts">06:55</span></div><p>Sign-off. Our legal team has to approve the near-final page, and they don't have logins, so I screenshot every section, paste them into a deck, and email it. By the time they approve, the page has usually changed again. A view-only link I could send them would save me an afternoon per campaign.</p></div></div>
+
+            <div class="msg"><div class="avatar maya">M</div><div><div class="who">Maya <span class="role">Lumi Skincare</span><span class="ts">07:48</span></div><p>And you're taking Hydra Glow to Canada and Mexico in the fall — how are you feeling about that?</p></div></div>
+
+            <div class="msg"><div class="avatar maya">M</div><div><div class="who">Maya <span class="role">Lumi Skincare</span><span class="ts">08:01</span></div><p>Slightly dreading it, if I'm honest. Last time we did multi-market it felt like building the same campaign three times from scratch — re-uploading everything, redoing the setup per market. If the US build could carry over and we just swap the language and the legal bits, that would be a different story.</p></div></div>
+
+            <div class="msg"><div class="avatar rachel">R</div><div><div class="who">Rachel <span class="role">SoPost</span><span class="ts">09:12</span></div><p>All good to know. On the positive side — how did the reporting land with your leadership after the spring campaign?</p></div></div>
+
+            <div class="msg"><div class="avatar maya">M</div><div><div class="who">Maya <span class="role">Lumi Skincare</span><span class="ts">09:20</span></div><p>That's the bit that keeps us coming back. The consumer data is genuinely better than anything we get from paid social — my director quoted the purchase intent numbers in a board deck. If the getting-it-live part felt as good as the results part, I'd have nothing to moan about.</p></div></div>
+          </div>
+        </div>
       </div>
-
-      <div class="listen-bar">
-        <button class="primary" id="listenBtn" onclick="toggleListen()">&#9654; Listen to the call</button>
-        <button id="stopBtn" onclick="stopListen()" style="display:none;">Stop</button>
-        <span class="note">Or read it below — same call either way. Follow along as it plays.</span>
+      <div>
+        <div class="card">
+          <h2>Capture insights as you read</h2>
+          <p class="lede" style="font-size:15px; margin-bottom:18px;">Write down 3–5 insights from the call while you read. An insight isn't a quote — it's the underlying problem.</p>
+          <div id="insightInputs"></div>
+          <p class="hint">Tip: for each one, ask yourself "what is she actually trying to do, and what's getting in the way?"</p>
+        </div>
       </div>
-
-      <div class="msg"><div class="avatar rachel">R</div><div><div class="who">Rachel <span class="role">SoPost</span><span class="ts">02:14</span></div><p>So the Hydra Glow campaign — launch is pencilled for the 28th. How are you feeling about where we are?</p></div></div>
-
-      <div class="msg"><div class="avatar maya">M</div><div><div class="who">Maya <span class="role">Lumi Skincare</span><span class="ts">02:31</span></div><p>Honestly? Mostly good. But getting the assets to you nearly broke me this week. We're still doing it over email and our brand pack bounced twice because of file size limits. Then your designer built the page with an old logo because the final version was buried three replies deep in a thread called "RE: RE: FW: assets".</p></div></div>
-
-      <div class="msg"><div class="avatar rachel">R</div><div><div class="who">Rachel <span class="role">SoPost</span><span class="ts">03:10</span></div><p>I saw that thread. I'm sorry — we caught it before launch at least.</p></div></div>
-
-      <div class="msg"><div class="avatar maya">M</div><div><div class="who">Maya <span class="role">Lumi Skincare</span><span class="ts">03:22</span></div><p>We did, but it cost us two days. And it's every campaign, not just this one. Someone on my side always asks "which version did they actually use?" and nobody's sure. I'd love it if I could just put the files somewhere you can all see, with the latest version obvious.</p></div></div>
-
-      <div class="msg"><div class="avatar rachel">R</div><div><div class="who">Rachel <span class="role">SoPost</span><span class="ts">04:05</span></div><p>That's fair. What about the review process on the page itself? You've been using the comments in the builder, right?</p></div></div>
-
-      <div class="msg"><div class="avatar maya">M</div><div><div class="who">Maya <span class="role">Lumi Skincare</span><span class="ts">04:18</span></div><p>Yes — and I like that they exist! But it's a one-way street. I leave a comment, and then… nothing. Your team can't reply to it in the tool, so the actual answer comes back to me on email or in our Teams channel. So half the conversation lives on the page and half lives somewhere else. Last week I genuinely couldn't remember whether the headline question was resolved or not.</p></div></div>
-
-      <div class="msg"><div class="avatar rachel">R</div><div><div class="who">Rachel <span class="role">SoPost</span><span class="ts">05:02</span></div><p>So the thread gets split between the builder and your inbox.</p></div></div>
-
-      <div class="msg"><div class="avatar maya">M</div><div><div class="who">Maya <span class="role">Lumi Skincare</span><span class="ts">05:09</span></div><p>Exactly. And while we're on comments — they attach to the whole page, not the bit I'm talking about. I wrote "can we soften this headline?" and your designer changed the hero headline, but I meant the one halfway down next to the ingredients. Totally reasonable mistake, because the comment just floats at the top. I've started writing things like "third block down, left side" which feels ridiculous.</p></div></div>
-
-      <div class="msg"><div class="avatar rachel">R</div><div><div class="who">Rachel <span class="role">SoPost</span><span class="ts">06:40</span></div><p>Noted — twice, in the right place. Anything else in the flow that slows you down?</p></div></div>
-
-      <div class="msg"><div class="avatar maya">M</div><div><div class="who">Maya <span class="role">Lumi Skincare</span><span class="ts">06:55</span></div><p>Sign-off. Our legal team has to approve the near-final page, and they don't have logins, so I screenshot every section, paste them into a deck, and email it. By the time they approve, the page has usually changed again. A view-only link I could send them would save me an afternoon per campaign.</p></div></div>
-
-      <div class="msg"><div class="avatar maya">M</div><div><div class="who">Maya <span class="role">Lumi Skincare</span><span class="ts">07:48</span></div><p>And you're taking Hydra Glow to Canada and Mexico in the fall — how are you feeling about that?</p></div></div>
-
-      <div class="msg"><div class="avatar maya">M</div><div><div class="who">Maya <span class="role">Lumi Skincare</span><span class="ts">08:01</span></div><p>Slightly dreading it, if I'm honest. Last time we did multi-market it felt like building the same campaign three times from scratch — re-uploading everything, redoing the setup per market. If the US build could carry over and we just swap the language and the legal bits, that would be a different story.</p></div></div>
-
-      <div class="msg"><div class="avatar rachel">R</div><div><div class="who">Rachel <span class="role">SoPost</span><span class="ts">09:12</span></div><p>All good to know. On the positive side — how did the reporting land with your leadership after the spring campaign?</p></div></div>
-
-      <div class="msg"><div class="avatar maya">M</div><div><div class="who">Maya <span class="role">Lumi Skincare</span><span class="ts">09:20</span></div><p>That's the bit that keeps us coming back. The consumer data is genuinely better than anything we get from paid social — my director quoted the purchase intent numbers in a board deck. If the getting-it-live part felt as good as the results part, I'd have nothing to moan about.</p></div></div>
     </div>
 
     <div class="footer-nav">
       <span></span>
-      <button class="primary" onclick="go(1)">Next: capture insights</button>
+      <button class="primary" onclick="go(1)">Review insights</button>
     </div>
   </section>
 
   <!-- STAGE 1: CAPTURE -->
+  <section class="stage" id="stage1">
+    <div class="card">
+      <h2>Review your insights</h2>
+      <p class="lede" style="font-size:15px; margin-bottom:18px;">Check what you captured before you move on to prioritisation.</p>
+      <div id="insightReview"></div>
+      <p class="hint">If you want to edit an insight, go back to the call and update it there.</p>
+    </div>
+    <div class="footer-nav">
+      <button onclick="go(0)">Back to the call</button>
+      <button class="primary" onclick="buildRank()">Next: prioritise these</button>
+    </div>
+    <p class="err" id="err1">Add at least 3 insights before moving on.</p>
+  </section>
+
+  <!-- STAGE 2: PRIORITISE + MAYA -->
   <section class="stage" id="stage1">
     <div class="card">
       <h2>What did you hear?</h2>
@@ -660,7 +689,7 @@ function go(n){
   });
   const stageMessages={
     0:'Read the transcript, then continue through the exercise.',
-    1:'Capture the key problems you heard. Aim for 3-5 solid insights.',
+    1:'Review the insights you captured and make sure they are ready to prioritise.',
     2:'Great — now put your insights in order and probe Maya.',
     3:'Use the data to challenge your instincts and refine the ranking.',
     4:'Defend your order to Craig and tighten your reasoning.',
@@ -668,9 +697,25 @@ function go(n){
     6:'You’ve got a clear pitch ready for the product team.'
   };
   setStatus(stageMessages[n] || 'You’re moving through the exercise.', 'info');
+  if(n===1) renderInsightReview();
   if(n===3) renderRank('rankList2');
   if(n===4) renderRank('rankList3');
   window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function renderInsightReview(){
+  const host=document.getElementById('insightReview');
+  host.innerHTML='';
+  const vals=[...document.querySelectorAll('#insightInputs input')].map(x=>x.value.trim()).filter(Boolean);
+  if(vals.length===0){
+    host.innerHTML='<p style="color:var(--ink-soft); margin:0;">You have no insights yet. Add them on the call transcript page.</p>';
+    return;
+  }
+  vals.forEach((txt,i)=>{
+    const item=document.createElement('div'); item.className='rank-item';
+    item.innerHTML='<div class="pos">'+(i+1)+'</div><div class="txt">'+esc(txt)+'</div>';
+    host.appendChild(item);
+  });
 }
 
 function buildRank(){
