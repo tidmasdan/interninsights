@@ -106,16 +106,6 @@
   .badge{display:inline-block; font-size:12px; font-weight:600; padding:3px 10px; border-radius:999px; background:var(--teal-soft); color:var(--teal-deep);}
 
   .footer-nav{display:flex; justify-content:space-between; margin-top:28px;}
-  .hero-card{display:flex; justify-content:space-between; gap:16px; align-items:flex-start; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:20px; margin-bottom:20px;}
-  .hero-card .hero-copy{flex:1;}
-  .hero-card .hero-actions{display:flex; gap:8px; flex-wrap:wrap;}
-  .status-bar{display:flex; align-items:center; gap:10px; border:1px solid var(--line); border-radius:999px; padding:8px 12px; margin-top:12px; background:var(--paper); color:var(--ink-soft); font-size:13px;}
-  .status-bar .pill{display:inline-flex; align-items:center; justify-content:center; padding:4px 10px; border-radius:999px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.08em;}
-  .status-bar.info .pill{background:var(--teal-soft); color:var(--teal-deep);}
-  .status-bar.busy .pill{background:var(--amber-soft); color:var(--amber);}
-  .status-bar.success .pill{background:var(--teal-soft); color:var(--teal-deep);}
-  .status-bar.error .pill{background:var(--coral-soft); color:var(--coral);}
-  .status-bar .text{flex:1;}
   .err{color:var(--coral); font-size:13px; margin-top:8px; display:none;}
   .keybar{display:none; background:var(--coral-soft); border:1px solid var(--coral); border-radius:10px; padding:14px 16px; margin-bottom:20px;}
   .keybar h3{color:var(--coral); margin-bottom:6px;}
@@ -144,20 +134,6 @@
     <div class="step"><span class="dot">7</span>Present</div>
   </div>
 
-  <div class="hero-card">
-    <div class="hero-copy">
-      <div class="status-bar info" id="statusBar" role="status" aria-live="polite">
-        <span class="pill" id="statusPill">Guide</span>
-        <span class="text" id="statusText">Read the transcript, then move through the exercise.</span>
-      </div>
-    </div>
-    <div class="hero-actions">
-      <button class="primary" onclick="go(0)">Start</button>
-      <button onclick="resetJourney()">Restart</button>
-    </div>
-  </div>
-
-  <!-- ElevenLabs voice control (optional) -->
   <div class="keybar" id="keybar" style="display:none;">
     <p style="font-size:13px; color:var(--ink-soft); margin:12px 0 10px;"><strong>Optional — real voices:</strong> add an ElevenLabs key and the call plays with natural voices, and the characters speak their replies out loud.</p>
     <div class="row">
@@ -455,21 +431,7 @@ const HOSTED = !IS_LOCAL;
 let SERVER_TTS = HOSTED ? 'unknown' : 'no';
 const EL_VOICES={ rachel:'Xb7hH8MSUJpSbSDYk0k2', maya:'pFZP5JQG7iQjIQuC4Bku', priya:'XB0fDUnXU5powFXDhCwa', craig:'JBFqnCBsd6RMkjVDRZzb', maya2:'pFZP5JQG7iQjIQuC4Bku' };
 let chatAudio=null;
-setStatus('Read the transcript, then move through the exercise.', 'info');
-
-function setStatus(text, tone='info'){
-  const bar=document.getElementById('statusBar');
-  const pill=document.getElementById('statusPill');
-  const label=document.getElementById('statusText');
-  if(!bar || !pill || !label) return;
-  bar.className='status-bar '+tone;
-  pill.textContent=tone==='busy'?'Working':tone==='success'?'Guide':tone==='error'?'Needs attention':'Guide';
-  label.textContent=text;
-}
-
-function resetJourney(){
-  window.location.reload();
-}
+function setStatus(){ }
 
 function saveElKey(){
   const v=document.getElementById('elKeyInput').value.trim();
