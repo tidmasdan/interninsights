@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Insight Game — SoPost Product Day</title>
+<title>Campaign Builder: A PM Simulation</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -131,9 +131,8 @@
 <body>
 <div class="wrap">
 
-  <p class="eyebrow">SoPost product day</p>
-  <h1>The Insight Game</h1>
-  <p class="lede" style="margin-top:8px;">Today you're a product manager. A brand has been on a call with our Customer Success team — your job is to work out what's really bothering them, test your thinking against the brand and our own data, decide what we should fix first, and defend your call to the product team.</p>
+  <p class="eyebrow">SoPost</p>
+  <h1>Campaign Builder: A PM Simulation</h1>
 
   <div class="stepper" id="stepper">
     <div class="step"><span class="dot">1</span>Read the call</div>
@@ -147,15 +146,13 @@
 
   <div class="hero-card">
     <div class="hero-copy">
-      <h2>Start with the call, then build your case</h2>
-      <p class="lede" style="margin-top:6px;">Read the transcript, capture the real problems, ask Maya and Priya sharp questions, then defend your priority order to Craig.</p>
       <div class="status-bar info" id="statusBar" role="status" aria-live="polite">
-        <span class="pill" id="statusPill">Ready</span>
-        <span class="text" id="statusText">The exercise is ready. Read the call, then move to the next step.</span>
+        <span class="pill" id="statusPill">Guide</span>
+        <span class="text" id="statusText">Read the transcript, then move through the exercise.</span>
       </div>
     </div>
     <div class="hero-actions">
-      <button class="primary" onclick="go(0)">Start the call</button>
+      <button class="primary" onclick="go(0)">Start</button>
       <button onclick="resetJourney()">Restart</button>
     </div>
   </div>
@@ -423,7 +420,7 @@
   <!-- STAGE 6: SUMMARY -->
   <section class="stage" id="stage6">
     <div class="card">
-      <span class="badge">Ready to present</span>
+      <span class="badge">Presentation summary</span>
       <h2 style="margin-top:12px;">Your pitch to the product team</h2>
       <p class="lede" style="font-size:15px; margin-bottom:20px;">Walk Dan, Dave and Bethan through this. Expect questions — that's the job.</p>
       <div class="sum-block">
@@ -458,7 +455,7 @@ const HOSTED = !IS_LOCAL;
 let SERVER_TTS = HOSTED ? 'unknown' : 'no';
 const EL_VOICES={ rachel:'Xb7hH8MSUJpSbSDYk0k2', maya:'pFZP5JQG7iQjIQuC4Bku', priya:'XB0fDUnXU5powFXDhCwa', craig:'JBFqnCBsd6RMkjVDRZzb', maya2:'pFZP5JQG7iQjIQuC4Bku' };
 let chatAudio=null;
-setStatus('The exercise is ready. Read the call, then move to the next step.', 'info');
+setStatus('Read the transcript, then move through the exercise.', 'info');
 
 function setStatus(text, tone='info'){
   const bar=document.getElementById('statusBar');
@@ -466,7 +463,7 @@ function setStatus(text, tone='info'){
   const label=document.getElementById('statusText');
   if(!bar || !pill || !label) return;
   bar.className='status-bar '+tone;
-  pill.textContent=tone==='busy'?'Working':tone==='success'?'Ready':tone==='error'?'Needs attention':'Ready';
+  pill.textContent=tone==='busy'?'Working':tone==='success'?'Guide':tone==='error'?'Needs attention':'Guide';
   label.textContent=text;
 }
 
@@ -481,7 +478,7 @@ function saveElKey(){
   document.getElementById('elKeyInput').value='';
   document.getElementById('voiceRow').style.display='block';
   if(callAudio){ callAudio.pause(); callAudio=null; }
-  setStatus('Voice setup is ready. Richer playback will be used when available.', 'success');
+  setStatus('Voice setup is active. Richer playback will be used when available.', 'success');
 }
 
 async function elSpeak(text, voiceId){
@@ -700,7 +697,7 @@ function go(n){
     s.classList.toggle('done', i<n);
   });
   const stageMessages={
-    0:'The call transcript is ready. Read it, then move to capture insights.',
+    0:'Read the transcript, then continue through the exercise.',
     1:'Capture the key problems you heard. Aim for 3-5 solid insights.',
     2:'Great — now put your insights in order and probe Maya.',
     3:'Use the data to challenge your instincts and refine the ranking.',
@@ -942,7 +939,7 @@ function finishLoop(){
   const total=chats.maya.count+chats.priya.count;
   const changed=JSON.stringify(originalOrder)!==JSON.stringify(order);
   document.getElementById('qNote').textContent=(total===0 ? "Next time, try interrogating the problem before deciding — it's the PM superpower. " : (total>=5 ? "Great instinct — evidence before opinion. " : "A solid start — the more you probe, the safer your ranking gets. "))+"You survived "+chats.craig.count+" rounds with Craig"+(changed?", changed your plan when the evidence changed,":" and held your ground,")+" and closed the loop with Maya like a pro.";
-  setStatus('Your pitch is ready. You’ve got a clear story and a thoughtful rationale.', 'success'); go(6);
+  setStatus('Your pitch is prepared. You’ve got a clear story and a thoughtful rationale.', 'success'); go(6);
 }
 </script>
 </body>
