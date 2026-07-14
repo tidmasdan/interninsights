@@ -106,6 +106,16 @@
   .badge{display:inline-block; font-size:12px; font-weight:600; padding:3px 10px; border-radius:999px; background:var(--teal-soft); color:var(--teal-deep);}
 
   .footer-nav{display:flex; justify-content:space-between; margin-top:28px;}
+  .hero-card{display:flex; justify-content:space-between; gap:16px; align-items:flex-start; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:20px; margin-bottom:20px;}
+  .hero-card .hero-copy{flex:1;}
+  .hero-card .hero-actions{display:flex; gap:8px; flex-wrap:wrap;}
+  .status-bar{display:flex; align-items:center; gap:10px; border:1px solid var(--line); border-radius:999px; padding:8px 12px; margin-top:12px; background:var(--paper); color:var(--ink-soft); font-size:13px;}
+  .status-bar .pill{display:inline-flex; align-items:center; justify-content:center; padding:4px 10px; border-radius:999px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.08em;}
+  .status-bar.info .pill{background:var(--teal-soft); color:var(--teal-deep);}
+  .status-bar.busy .pill{background:var(--amber-soft); color:var(--amber);}
+  .status-bar.success .pill{background:var(--teal-soft); color:var(--teal-deep);}
+  .status-bar.error .pill{background:var(--coral-soft); color:var(--coral);}
+  .status-bar .text{flex:1;}
   .err{color:var(--coral); font-size:13px; margin-top:8px; display:none;}
   .keybar{display:none; background:var(--coral-soft); border:1px solid var(--coral); border-radius:10px; padding:14px 16px; margin-bottom:20px;}
   .keybar h3{color:var(--coral); margin-bottom:6px;}
@@ -133,6 +143,21 @@
     <div class="step"><span class="dot">5</span>Defend it</div>
     <div class="step"><span class="dot">6</span>Close the loop</div>
     <div class="step"><span class="dot">7</span>Present</div>
+  </div>
+
+  <div class="hero-card">
+    <div class="hero-copy">
+      <h2>Start with the call, then build your case</h2>
+      <p class="lede" style="margin-top:6px;">Read the transcript, capture the real problems, ask Maya and Priya sharp questions, then defend your priority order to Craig.</p>
+      <div class="status-bar info" id="statusBar" role="status" aria-live="polite">
+        <span class="pill" id="statusPill">Ready</span>
+        <span class="text" id="statusText">The exercise is ready. Read the call, then move to the next step.</span>
+      </div>
+    </div>
+    <div class="hero-actions">
+      <button class="primary" onclick="go(0)">Start the call</button>
+      <button onclick="resetJourney()">Restart</button>
+    </div>
   </div>
 
   <!-- ElevenLabs voice control (optional) -->
@@ -194,7 +219,7 @@
 
     <div class="footer-nav">
       <span></span>
-      <button class="primary" onclick="go(1)">I've read it — capture insights</button>
+      <button class="primary" onclick="go(1)">Next: capture insights</button>
     </div>
   </section>
 
@@ -433,18 +458,30 @@ const HOSTED = !IS_LOCAL;
 let SERVER_TTS = HOSTED ? 'unknown' : 'no';
 const EL_VOICES={ rachel:'Xb7hH8MSUJpSbSDYk0k2', maya:'pFZP5JQG7iQjIQuC4Bku', priya:'XB0fDUnXU5powFXDhCwa', craig:'JBFqnCBsd6RMkjVDRZzb', maya2:'pFZP5JQG7iQjIQuC4Bku' };
 let chatAudio=null;
+setStatus('The exercise is ready. Read the call, then move to the next step.', 'info');
 
+function setStatus(text, tone='info'){
+  const bar=document.getElementById('statusBar');
+  const pill=document.getElementById('statusPill');
+  const label=document.getElementById('statusText');
+  if(!bar || !pill || !label) return;
+  bar.className='status-bar '+tone;
+  pill.textContent=tone==='busy'?'Working':tone==='success'?'Ready':tone==='error'?'Needs attention':'Ready';
+  label.textContent=text;
+}
 
+function resetJourney(){
+  window.location.reload();
+}
 
 function saveElKey(){
   const v=document.getElementById('elKeyInput').value.trim();
-  if(!v){ return; }
+  if(!v){ setStatus('Add an ElevenLabs key to enable richer voices.', 'error'); return; }
   EL_KEY=v;
   document.getElementById('elKeyInput').value='';
   document.getElementById('voiceRow').style.display='block';
-  document.getElementById('keyTitle').textContent='Voices ready';
-  document.getElementById('keyMsg').textContent='Maya, Priya and Craig are powered by Anthropic through the secure server-side key configured for this deployment. No API key is sent from the browser.';
   if(callAudio){ callAudio.pause(); callAudio=null; }
+  setStatus('Voice setup is ready. Richer playback will be used when available.', 'success');
 }
 
 async function elSpeak(text, voiceId){
@@ -560,9 +597,9 @@ function getLines(){
 
 function toggleListen(){
   if(voiceCapable()){
-    if(playState==='playing'){ if(chatAudio) chatAudio.pause(); playState='paused'; setListenUI(); return; }
-    if(playState==='paused' && chatAudio){ chatAudio.play(); playState='playing'; setListenUI(); return; }
-    playIdx=0; playState='playing'; setListenUI(); elPlayTranscript(); return;
+    if(playState==='playing'){ if(chatAudio) chatAudio.pause(); playState='paused'; setListenUI(); setStatus('Listening paused. Resume whenever you like.', 'info'); return; }
+    if(playState==='paused' && chatAudio){ chatAudio.play(); playState='playing'; setListenUI(); setStatus('Listening to the call…', 'busy'); return; }
+    playIdx=0; playState='playing'; setListenUI(); setStatus('Listening to the call…', 'busy'); elPlayTranscript(); return;
   }
   const a=initAudio();
   if(a){
@@ -570,10 +607,10 @@ function toggleListen(){
     else { a.play(); playState='playing'; }
     setListenUI(); return;
   }
-  if(!('speechSynthesis' in window)){ alert('Voice playback is not supported in this browser — the transcript below tells the same story.'); return; }
+  if(!('speechSynthesis' in window)){ setStatus('Voice playback isn’t supported in this browser — the transcript still tells the same story.', 'error'); return; }
   if(playState==='playing'){ speechSynthesis.pause(); playState='paused'; setListenUI(); return; }
   if(playState==='paused'){ speechSynthesis.resume(); playState='playing'; setListenUI(); return; }
-  pickVoices(); playIdx=0; playState='playing'; setListenUI(); speakNext();
+  pickVoices(); playIdx=0; playState='playing'; setListenUI(); setStatus('Listening to the call…', 'busy'); speakNext();
 }
 
 const elCache={};
@@ -611,7 +648,7 @@ async function elPlayTranscript(){
       pickVoices(); playIdx=0; playState='playing'; setListenUI(); speakNext();
       return;
     }
-    alert('Voice generation hit a problem (check the ElevenLabs key or credits) — falling back to browser voices.');
+    setStatus('Voice generation hit a problem — falling back to browser voices.', 'error');
     EL_KEY_FALLBACK();
     return;
   }
@@ -645,6 +682,7 @@ function stopListen(){
   if('speechSynthesis' in window) speechSynthesis.cancel();
   document.querySelectorAll('#stage0 .msg').forEach(m=>m.classList.remove('playing'));
   setListenUI();
+  setStatus('The call is paused. You can continue reading or jump to the next step.', 'info');
 }
 
 function setListenUI(){
@@ -661,6 +699,16 @@ function go(n){
     s.classList.toggle('active', i===n);
     s.classList.toggle('done', i<n);
   });
+  const stageMessages={
+    0:'The call transcript is ready. Read it, then move to capture insights.',
+    1:'Capture the key problems you heard. Aim for 3-5 solid insights.',
+    2:'Great — now put your insights in order and probe Maya.',
+    3:'Use the data to challenge your instincts and refine the ranking.',
+    4:'Defend your order to Craig and tighten your reasoning.',
+    5:'Close the loop with Maya and give her a concrete update.',
+    6:'You’ve got a clear pitch ready for the product team.'
+  };
+  setStatus(stageMessages[n] || 'You’re moving through the exercise.', 'info');
   if(n===3) renderRank('rankList2');
   if(n===4) renderRank('rankList3');
   window.scrollTo({top:0, behavior:'smooth'});
@@ -668,10 +716,10 @@ function go(n){
 
 function buildRank(){
   const vals=[...document.querySelectorAll('#insightInputs input')].map(x=>x.value.trim()).filter(Boolean);
-  if(vals.length<3){document.getElementById('err1').style.display='block'; return;}
+  if(vals.length<3){document.getElementById('err1').style.display='block'; setStatus('Add at least three insights before moving on.', 'error'); return;}
   document.getElementById('err1').style.display='none';
   insights=vals; order=insights.map((_,i)=>i);
-  renderRank('rankList'); go(2);
+  renderRank('rankList'); setStatus('Your insights are in place. Ask Maya to sharpen your thinking.', 'success'); go(2);
 }
 
 function renderRank(hostId){
@@ -744,11 +792,13 @@ async function sendChat(who){
   c.count++;
   const names={maya:'Maya', priya:'Priya', craig:'Craig', maya2:'Maya'};
   const typing=addBubble(c.log, names[who]+' is typing…', 'them typing');
+  setStatus('Working on a reply…', 'busy');
   try{
     const reply=(await callClaude(SYSTEMS[who], c.history))||"Sorry, you cut out there — say that again?";
     typing.remove();
     addBubble(c.log, reply, 'them');
     c.history.push({role:'assistant', content:reply});
+    setStatus(names[who]+' replied. Keep going.', 'success');
     speakReply(who, reply);
   }catch(e){
     typing.remove();
@@ -757,6 +807,7 @@ async function sendChat(who){
       : "Sorry — my connection dropped. Try that once more?";
     addBubble(c.log, msg, 'them');
     c.history.pop(); c.count--;
+    setStatus('The reply didn’t come through. Try that one again.', 'error');
   }
 }
 function addBubble(logId, text, cls){
@@ -768,10 +819,10 @@ function addBubble(logId, text, cls){
 
 function buildSummary(){
   const rat=document.getElementById('rationale').value.trim();
-  if(rat.length<20){document.getElementById('err2').style.display='block'; return;}
+  if(rat.length<20){document.getElementById('err2').style.display='block'; setStatus('Add a bit more reasoning before you move to Craig.', 'error'); return;}
   document.getElementById('err2').style.display='none';
   briefCraig(rat);
-  go(4);
+  setStatus('Your reasoning is locked in. Defend it to Craig.', 'success'); go(4);
 }
 
 function briefCraig(rationale){
@@ -825,10 +876,10 @@ Open the conversation yourself: greet them briefly, note you've read their list,
 }
 
 function finishDefend(){
-  if(chats.craig.count<2){document.getElementById('err3').style.display='block'; return;}
+  if(chats.craig.count<2){document.getElementById('err3').style.display='block'; setStatus('Give Craig a bit more of a push before wrapping up.', 'error'); return;}
   document.getElementById('err3').style.display='none';
   briefMaya2();
-  go(5);
+  setStatus('You’ve got Craig’s pressure test. Now close the loop with Maya.', 'success'); go(5);
 }
 
 function briefMaya2(){
@@ -875,7 +926,7 @@ Open the conversation yourself: a short friendly message - you heard they met wi
 }
 
 function finishLoop(){
-  if(chats.maya2.count<2){document.getElementById('err4').style.display='block'; return;}
+  if(chats.maya2.count<2){document.getElementById('err4').style.display='block'; setStatus('Give Maya a fuller update before you lock in the pitch.', 'error'); return;}
   document.getElementById('err4').style.display='none';
   const rat=document.getElementById('rationale').value.trim();
   const list=document.getElementById('sumList'); list.innerHTML='';
@@ -891,7 +942,7 @@ function finishLoop(){
   const total=chats.maya.count+chats.priya.count;
   const changed=JSON.stringify(originalOrder)!==JSON.stringify(order);
   document.getElementById('qNote').textContent=(total===0 ? "Next time, try interrogating the problem before deciding — it's the PM superpower. " : (total>=5 ? "Great instinct — evidence before opinion. " : "A solid start — the more you probe, the safer your ranking gets. "))+"You survived "+chats.craig.count+" rounds with Craig"+(changed?", changed your plan when the evidence changed,":" and held your ground,")+" and closed the loop with Maya like a pro.";
-  go(6);
+  setStatus('Your pitch is ready. You’ve got a clear story and a thoughtful rationale.', 'success'); go(6);
 }
 </script>
 </body>
