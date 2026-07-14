@@ -135,9 +135,8 @@
     <div class="step"><span class="dot">7</span>Present</div>
   </div>
 
-  <div class="keybar" id="keybar">
-    <h3 id="keyTitle">Secure chat connection</h3>
-    <p id="keyMsg">Maya, Priya and Craig are powered by Anthropic through the secure server-side key configured for this deployment. No API key is sent from the browser.</p>
+  <!-- ElevenLabs voice control (optional) -->
+  <div class="keybar" id="keybar" style="display:none;">
     <p style="font-size:13px; color:var(--ink-soft); margin:12px 0 10px;"><strong>Optional — real voices:</strong> add an ElevenLabs key and the call plays with natural voices, and the characters speak their replies out loud.</p>
     <div class="row">
       <input type="text" id="elKeyInput" placeholder="ElevenLabs key (optional)" autocomplete="off">
@@ -493,12 +492,7 @@ async function speakReply(who, text){
   }catch(e){}
 }
 
-function showKeybar(){
-  const bar=document.getElementById('keybar');
-  bar.style.display='block';
-  bar.scrollIntoView({behavior:'smooth', block:'center'});
-}
-document.addEventListener('DOMContentLoaded', showKeybar);
+// keybar UI is hidden in production; don't show it automatically
 
 async function callClaude(system, messages){
   const r=await fetch('/api/chat',{method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({system, messages})});
