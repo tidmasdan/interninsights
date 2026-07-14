@@ -512,38 +512,30 @@ function showKeybar(){
   bar.style.display='block';
   bar.scrollIntoView({behavior:'smooth', block:'center'});
 }
-if(IS_LOCAL) document.addEventListener('DOMContentLoaded', showKeybar);
+document.addEventListener('DOMContentLoaded', showKeybar);
 
 async function callClaude(system, messages){
-  if(HOSTED){
-    const doCall=async()=>{
-      const headers={'Content-Type':'application/json'};
-      if(GAME_CODE) headers['x-game-code']=GAME_CODE;
-      return fetch('/api/chat',{method:'POST', headers, body:JSON.stringify({system, messages})});
-    };
-    let r=await doCall();
-    if(r.status===401 && askGameCode()){ r=await doCall(); }
-    if(!r.ok) throw new Error('api '+r.status);
-    const data=await r.json();
-    return (data.text||'').trim();
-  }
-  const headers={'Content-Type':'application/json'};
   if(API_KEY){
+    const headers={'Content-Type':'application/json'};
     headers['x-api-key']=API_KEY;
     headers['anthropic-version']='2023-06-01';
     headers['anthropic-dangerous-direct-browser-access']='true';
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST', headers, body:JSON.stringify({model:'claude-sonnet-4-6', max_tokens:1000, system, messages})});
+    if(!r.ok){ throw new Error('api '+r.status); }
+    const data=await r.json();
+    return (data.content||[]).filter(x=>x.type==='text').map(x=>x.text).join('\n').trim();
   }
-  const r=await fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST', headers,
-    body:JSON.stringify({model:'claude-sonnet-4-6', max_tokens:1000, system, messages})
-  });
+
+  const r=await fetch('/api/chat',{method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({system, messages})});
   if(!r.ok){
-    if(!API_KEY) showKeybar();
+    const body=await r.json().catch(()=>({}));
+    if(body.error==='anthropic not configured'){ throw new Error('anthropic not configured'); }
     throw new Error('api '+r.status);
   }
   const data=await r.json();
-  return (data.content||[]).filter(x=>x.type==='text').map(x=>x.text).join('\n').trim();
+  return (data.text||'').trim();
 }
+
 const chats={
   maya:{history:[], count:0, log:'mayaLog', box:'mayaBox'},
   priya:{history:[], count:0, log:'priyaLog', box:'priyaBox'},
@@ -791,7 +783,10 @@ async function sendChat(who){
     speakReply(who, reply);
   }catch(e){
     typing.remove();
-    addBubble(c.log, IS_LOCAL&&!API_KEY ? "We're not connected yet — pop an API key in the panel at the top of the page and try again." : "Sorry — my connection dropped. Try that once more?", 'them');
+    const msg = e && e.message==='anthropic not configured'
+      ? "Anthropic isn't configured yet. Paste an API key in the panel above and try again."
+      : (IS_LOCAL&&!API_KEY ? "We're not connected yet — pop an API key in the panel at the top of the page and try again." : "Sorry — my connection dropped. Try that once more?");
+    addBubble(c.log, msg, 'them');
     c.history.pop(); c.count--;
   }
 }

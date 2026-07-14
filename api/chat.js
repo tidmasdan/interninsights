@@ -3,11 +3,6 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'POST only' });
   }
 
-  // Optional access code: set GAME_CODE in Vercel env vars to require it
-  if (process.env.GAME_CODE && req.headers['x-game-code'] !== process.env.GAME_CODE) {
-    return res.status(401).json({ error: 'code required' });
-  }
-
   const { system, messages } = req.body || {};
   if (!system || !Array.isArray(messages)) {
     return res.status(400).json({ error: 'system and messages required' });
@@ -20,6 +15,10 @@ export default async function handler(req, res) {
   const totalChars = messages.reduce((n, m) => n + (typeof m.content === 'string' ? m.content.length : 0), 0);
   if (totalChars > 40000) {
     return res.status(400).json({ error: 'conversation too large' });
+  }
+
+  if (!process.env.ANTHROPIC_API_KEY) {
+    return res.status(501).json({ error: 'anthropic not configured' });
   }
 
   try {
