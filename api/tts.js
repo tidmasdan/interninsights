@@ -3,6 +3,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'POST only' });
   }
 
+  // TTS endpoint - no game code auth required
   // Voices are optional: no ElevenLabs key -> tell the client to fall back
   if (!process.env.ELEVENLABS_API_KEY) {
     return res.status(501).json({ error: 'tts not configured' });
