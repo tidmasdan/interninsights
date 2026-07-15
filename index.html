@@ -131,7 +131,7 @@
     <div class="step"><span class="dot">4</span>Check the data</div>
     <div class="step"><span class="dot">5</span>Defend it</div>
     <div class="step"><span class="dot">6</span>Close the loop</div>
-    <div class="step"><span class="dot">7</span>Present</div>
+    <div class="step"><span class="dot">7</span>Wrap up</div>
   </div>
 
   <div class="keybar" id="keybar" style="display:none;">
@@ -388,7 +388,7 @@
     <p class="hint" style="margin-top:10px;">A good update has three parts: what we're doing first, what that means for the thing she cared about, and when she'll hear from us next. No corporate waffle — she'll smell it.</p>
     <div class="footer-nav">
       <button onclick="go(4)">Back to Craig</button>
-      <button class="primary" onclick="finishLoop()">Loop closed — build my pitch</button>
+      <button class="primary" onclick="finishLoop()">Loop closed — see the wrap-up</button>
     </div>
     <p class="err" id="err4">Give Maya a proper update first — at least a couple of messages.</p>
   </section>
@@ -396,9 +396,13 @@
   <!-- STAGE 6: SUMMARY -->
   <section class="stage" id="stage6">
     <div class="card">
-      <span class="badge">Presentation summary</span>
-      <h2 style="margin-top:12px;">Your pitch to the product team</h2>
-      <p class="lede" style="font-size:15px; margin-bottom:20px;">Walk Dan, Dave and Bethan through this. Expect questions — that's the job.</p>
+      <span class="badge">Wrap-up summary</span>
+      <h2 style="margin-top:12px;">Your wrap-up</h2>
+      <p class="lede" style="font-size:15px; margin-bottom:20px;">You worked through the call, the data, the pressure test, and the follow-up. Here’s the path you took to get here.</p>
+      <div class="sum-block">
+        <h3>How the conversation unfolded</h3>
+        <p id="journeySummary" style="font-size:15px; color:var(--ink-soft);"></p>
+      </div>
       <div class="sum-block">
         <h3>Priorities, in order</h3>
         <ul class="sum-list" id="sumList"></ul>
@@ -410,9 +414,6 @@
       <div class="sum-block">
         <h3>Your research</h3>
         <p style="font-size:15px; color:var(--ink-soft);">You asked Maya <strong id="mayaCount">0</strong> questions and Priya <strong id="priyaCount">0</strong>. <span id="qNote"></span></p>
-      </div>
-      <div style="background:var(--teal-soft); border-radius:10px; padding:16px; font-size:14px; color:var(--teal-deep);">
-        <strong>What happens next:</strong> Bethan will take your #1 priority through the design process — from the problem you've defined to a sketch of the solution. Your ranking just set the agenda.
       </div>
     </div>
     <div class="footer-nav">
@@ -665,7 +666,7 @@ function go(n){
     3:'Use the data to challenge your instincts and refine the ranking.',
     4:'Defend your order to Craig and tighten your reasoning.',
     5:'Close the loop with Maya and give her a concrete update.',
-    6:'You’ve got a clear pitch ready for the product team.'
+    6:'You’ve got a clear wrap-up of the work and the evidence.'
   };
   setStatus(stageMessages[n] || 'You’re moving through the exercise.', 'info');
   if(n===3) renderRank('rankList2');
@@ -900,8 +901,9 @@ function finishLoop(){
   document.getElementById('priyaCount').textContent=chats.priya.count;
   const total=chats.maya.count+chats.priya.count;
   const changed=JSON.stringify(originalOrder)!==JSON.stringify(order);
-  document.getElementById('qNote').textContent=(total===0 ? "Next time, try interrogating the problem before deciding — it's the PM superpower. " : (total>=5 ? "Great instinct — evidence before opinion. " : "A solid start — the more you probe, the safer your ranking gets. "))+"You survived "+chats.craig.count+" rounds with Craig"+(changed?", changed your plan when the evidence changed,":" and held your ground,")+" and closed the loop with Maya like a pro.";
-  setStatus('Your pitch is prepared. You’ve got a clear story and a thoughtful rationale.', 'success'); go(6);
+  document.getElementById('journeySummary').textContent='You started with Maya’s view of the campaign pain points, tested the signal behind them with Priya’s data, and then let Craig challenge your ranking from a commercial angle before closing the loop with Maya.';
+  document.getElementById('qNote').textContent=(total===0 ? "Next time, try interrogating the problem before deciding — it's the PM superpower. " : (total>=5 ? "Great instinct — evidence before opinion. " : "A solid start — the more you probe, the safer your ranking gets. "))+(changed?"You changed your plan when the evidence changed, and you closed the loop with Maya like a pro.":"You held your ground when Craig challenged you, and you closed the loop with Maya like a pro.");
+  setStatus('Your wrap-up is ready. You’ve got a clear story and a thoughtful rationale.', 'success'); go(6);
 }
 </script>
 </body>
