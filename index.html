@@ -114,9 +114,7 @@
   .keybar input{flex:1;}
   .keybar.ok{background:var(--teal-soft); border-color:var(--teal);}
   .keybar.ok h3{color:var(--teal-deep);}
-  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:flex-start;}
-  .sticky-panel{position:sticky; top:20px; align-self:flex-start; max-height:calc(100vh - 140px); overflow:auto;}
-  .sticky-panel .card{margin-bottom:0;}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:20px;}
   @media(max-width:780px){.grid2{grid-template-columns:1fr;}}
 </style>
 </head>
@@ -196,7 +194,7 @@
           </div>
         </div>
       </div>
-      <div class="sticky-panel">
+      <div>
         <div class="card">
           <h2>Capture insights as you read</h2>
           <p class="lede" style="font-size:15px; margin-bottom:18px;">Write down 3–5 insights from the call while you read. An insight isn't a quote — it's the underlying problem.</p>
